@@ -1,0 +1,3 @@
+CAUTION: Using low level cart routines does *not* work on all flash carts. For
+more information see the comments in cart.h. To read data from ROM use the
+file API defined in file.h instead.

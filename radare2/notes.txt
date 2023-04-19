@@ -1,0 +1,27 @@
+
+0x02000b4c:
+    0x01ff8000, 0x620
+    0x0
+    0x027c0000, 0x60
+    0x0
+
+    0x20a5380 <-- data start
+
+Mapping the ITCM block:
+vaddr is the run-time address
+padder is the offset in the file (ARM9 binary)
+
+   fd   vaddr       size    padder  flags    name
+om 3    0x01ff8000  0x620   0xa9380 rwx      fmap.arm9.itcm
+
+Mapping the DTCM block:
+om 3    0x027c0000  0x60    0xa99a0 rw       fmap.arm9.dtcm
+
+Mapping the overlays:
+1) extract the overlay files
+2) extract the overlay table. The overlay table is an array of
+overlay_info structures (see overlay.h)
+3) open the overlay file using the 'o' command. Use the 'o' commands to get
+   file descriptor of the overlay file.
+3) map the sections using the above 'om' command. Example mapping overlay 4:
+  om 4 0x213a160 0x1c60 0x0 r-x fmap.overlay9_4
