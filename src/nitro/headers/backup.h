@@ -67,7 +67,7 @@
     ndk_backup_command((unsigned int)(src), (unsigned int)(dest), (count), \
                        NULL, 0, false, 8, 10, 2)
 
-#define ndk_backup_write(src, dest, count, cb, arg) \
+#define ndk_backup_write_async(src, dest, count, cb, arg) \
     ndk_backup_command((unsigned int)(src), (unsigned int)(dest), (count), \
                        (cb), (arg), true, 8, 10, 2)
 
