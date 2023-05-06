@@ -2,7 +2,7 @@
 
 ## Goal 
 
-To be able to access ROM data just like a commercial game (ROM dump).
+To be able to access ROM data just like a commercial game would do (ROM dump).
 
 ## Requirements and setup
 

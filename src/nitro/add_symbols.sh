@@ -19,13 +19,13 @@
 
 while read -r line
 do
-    if [ -z "$line" ]; then
-        continue
-    fi
+  if [ -z "$line" ]; then
+    continue
+  fi
 
-    if [ "#" == "${line:0:1}" ]; then
-        continue
-    fi
+  if [ "#" == "${line:0:1}" ]; then
+    continue
+  fi
 
-    $DEVKITARM/bin/arm-none-eabi-objcopy --add-symbol $line $1
+  $DEVKITARM/bin/arm-none-eabi-objcopy --add-symbol $line $1
 done < $2

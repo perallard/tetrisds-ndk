@@ -16,12 +16,10 @@ struct FAT_entry {
   unsigned int end;
 };
 
-
 static void init(void);
 static void init_displays(void);
 static void read_key_presses(void);
 static void vblank_handler(void);
-
 
 unsigned short old_gamepad_state;
 unsigned short gamepad_btn_down;
@@ -94,16 +92,16 @@ int main()
 
 void init()
 {
-    ndk_platform_init();
+  ndk_platform_init();
 
-    ndk_irq_set_handler(IE_VBLANK, &vblank_handler);
+  ndk_irq_set_handler(IE_VBLANK, &vblank_handler);
 
-    ndk_gfx_init();
-    ndk_irq_enable_interrupt_sources(IE_VBLANK);
-    // Master IRQ enable
-    IME = 1;
-    ndk_cpu_enable_irq();
-    ndk_lcd_set_vblank_irq_enable(1);
+  ndk_gfx_init();
+  ndk_irq_enable_interrupt_sources(IE_VBLANK);
+  // Master IRQ enable
+  IME = 1;
+  ndk_cpu_enable_irq();
+  ndk_lcd_set_vblank_irq_enable(1);
 }
 
 void init_displays()
