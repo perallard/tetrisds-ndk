@@ -1,6 +1,8 @@
 export ROOT_DIR = $(realpath .)
 export UTIL_PATH = $(realpath ../util)
 
+GCC_VERSION=$(shell ls $(DEVKITARM)/lib/gcc/arm-none-eabi)
+
 LD=$(DEVKITARM)/bin/arm-none-eabi-ld
 LDFLAGS= --use-blx -nostdlib -Map=build/smap
 
@@ -30,7 +32,7 @@ setup:
 
 build/arm9.o: $(OBJS)
 	$(LD) $(LDFLAGS) -T link.ld -o $@ $(OBJS) \
-	-L$(DEVKITARM)/lib/gcc/arm-none-eabi/8.3.0 \
+	-L$(DEVKITARM)/lib/gcc/arm-none-eabi/$(GCC_VERSION) \
 	-L$(DEVKITARM)/arm-none-eabi/lib -lgcc -lc
 
 $(OBJS) &: $(MODULES)

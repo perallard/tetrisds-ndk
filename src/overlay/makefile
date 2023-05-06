@@ -5,6 +5,8 @@ export OBJCOPY=$(DEVKITARM)/bin/arm-none-eabi-objcopy
 
 BUILD_DIR = build
 
+GCC_VERSION=$(shell ls $(DEVKITARM)/lib/gcc/arm-none-eabi)
+
 LD=$(DEVKITARM)/bin/arm-none-eabi-ld
 LDFLAGS= --use-blx -nostdlib -Map=$(BUILD_DIR)/smap
 
@@ -62,7 +64,7 @@ $(PATCHED_ROM_FILE): setup $(ARM9_PATCHES)
 
 $(ARM9_PATCHES): $(OBJS)
 	$(LD) $(LDFLAGS) -T link.ld -o $@ $(OBJS) \
-	-L$(DEVKITARM)/lib/gcc/arm-none-eabi/8.3.0 \
+	-L$(DEVKITARM)/lib/gcc/arm-none-eabi/$(GCC_VERSION) \
 	-L$(DEVKITARM)/arm-none-eabi/lib -lgcc -lc
 
 clean:
