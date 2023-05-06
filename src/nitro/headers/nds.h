@@ -1,5 +1,5 @@
 /**
- * IO and functions that no not yet have a module defined for them.
+ * IO and functions that do not yet have a module defined for them.
  *
  * See: https://problemkaputt.de/gbatek.htm#dsiomaps
  */

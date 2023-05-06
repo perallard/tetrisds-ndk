@@ -1,12 +1,11 @@
 /**
  * Timer API.
  *
- * The reason of reversing this module was only to resolve how the thead API
- * was dependet on timers.
+ * The reason for reversing this module was to resolve how the thread API was
+ * dependet on timers.
  *
  * NOTE: ndk_thread_sleep is implemented using timer 0 and 1. So use only
  * timers 2 and 3 to implement your own timing logic.
- *
  */
 #ifndef TIMERS_INCLUDE_GUARD
 #define TIMERS_INCLUDE_GUARD

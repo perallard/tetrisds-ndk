@@ -26,7 +26,7 @@ void game_init(void);
 void game_init_heaps(void);
 
 /**
- * Allocate memory from the main memory ie. area 0
+ * Allocate memory from the main memory i.e. area 0
  *
  * NOTE: Calls ndk_area_alloc_mem(0, -1, size)
  *
@@ -36,7 +36,7 @@ void game_init_heaps(void);
 void *game_alloc(int size);
 
 /**
- * Free memory from the main memory ie. area 0
+ * Free memory from the main memory i.e. area 0
  *
  * NOTE: Calls ndk_area_free_mem(0, -1, mem)
  *

@@ -2,7 +2,7 @@
 #define BIOS_RAM_INCLUDE_FILE
 
 /**
- * Memory initialized by BIOS/firmware a boot time.
+ * Memory initialized by BIOS/firmware at boot time.
  *
  * See: https://problemkaputt.de/gbatek.htm#biosramusage
  */
@@ -17,3 +17,4 @@ extern void *sys_memory_area_end_addresses[9];
 extern unsigned short boot_indicator;
 
 #endif // BIOS_RAM_INCLUDE_FILE
+

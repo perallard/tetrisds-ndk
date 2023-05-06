@@ -6,7 +6,7 @@
  * NOTE: The Backup API seem to be a sub-system to the cart API as both operate
  * on the same cart_state structure.
  *
- * NOTE: Backup read and writes are handled by the ARM7 ie. IPC communication
+ * NOTE: Backup read and writes are handled by the ARM7 i.e. IPC communication
  * is used.
  *
  * NOTE: The functions below depend on the cart_backup_state struct defined

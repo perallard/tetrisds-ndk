@@ -73,7 +73,7 @@ ndk_irq_handler_fn *ndk_irq_get_handler(unsigned int irq_mask);
  * of the SDK so it can't be overridden normally.
  *
  * NOTE: For all other IRQ sources to be compatible with the
- * ndk_thread_wait_irq function ie. sleep and awake on IRQ events the handler
+ * ndk_thread_wait_irq function i.e. sleep and awake on IRQ events the handler
  * function *must* set the corresponding bit in the thread_irq_bits memory
  * location to one. See dtcm.h. Here follows a minimal example of a V-Blank
  * interrupt handler:
@@ -151,7 +151,7 @@ unsigned int ndk_irq_write_interrupt_enable_register(unsigned int irq_mask);
  * next pending thread in the priority list.
  *
  * @param clear
- *        true: Clear the current IRQ state ie. wait for the next event.
+ *        true: Clear the current IRQ state i.e. wait for the next event.
  *        false: Don't clear the current IRQ state.
  * @param irq_mask See the Interrupt Request Flags register - 4000214h
  */

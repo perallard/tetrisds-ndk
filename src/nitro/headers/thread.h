@@ -3,8 +3,8 @@
  *
  * The thread system seem to be based upon events. That is events like
  * interrupt requests and timeouts will preempt the current thread. But all
- * threads should yield or exit when there is no more processing to be done.
- * To let lower priority threads to resume their execution.
+ * threads should yield or exit when there is no more processing to be done,
+ * to let lower priority threads to resume their execution.
  *
  * This module/logical unit also includes a mutex API.
  *

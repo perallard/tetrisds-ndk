@@ -6,7 +6,7 @@
 
 /**
  * For compressed firmware binaries (this includes overlays) this structure
- * is appended to end of the binary so that is can be decompressed by
+ * is appended to the end of the binary so that it can be decompressed by
  * ndk_decompress_firmware_LZ77.
  */
 struct fw_lz77_footer {

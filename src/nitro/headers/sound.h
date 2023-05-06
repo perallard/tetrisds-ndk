@@ -1036,7 +1036,7 @@ bool ndk_sound_sdat_load_group(int id, struct sound_sdat_heap *heap);
  * NOTE: The SEQARC must have been loaded before this function is called.
  *
  * NOTE: If the handle is already referencing another sound source it will be
- * unreferenced ie. a handler can only reference one sound source at a time.
+ * unreferenced i.e. a handler can only reference one sound source at a time.
  *
  * @param handle
  * @param seqarc_id
@@ -1052,7 +1052,7 @@ bool ndk_sound_add_source_seqarc(struct sound_handle *handle, int seqarc_id,
  * NOTE: The SEQ must have been loaded before this function is called.
  *
  * NOTE: If the handle is already referencing another sound source it will be
- * unreferenced ie. a handler can only reference one sound source at a time.
+ * unreferenced i.e. a handler can only reference one sound source at a time.
  *
  * @param handle
  * @param seq_id

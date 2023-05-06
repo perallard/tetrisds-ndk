@@ -1,5 +1,5 @@
 /**
- * Touch API
+ * Touch API.
  *
  * NOTE: All Touch samples are read as raw ADC values and thus must be
  * transformed into screen coordinates using this API.
@@ -16,7 +16,8 @@
  * if (! ndk_touch_get_transform_from_firmware_settings(&xform))
  *     ndk_panic();
  *
- * // Tells the touch API to use this transform data.
+ * // Tells the touch API to use this transform to convert raw ADC data to
+ * // screen space coordinates.
  * ndk_touch_set_coordinate_transform(&xform);
  *
  * // Now get raw touch sample (stored in raw)
@@ -139,7 +140,9 @@ void ndk_touch_init(void);
 /**
  * Request a sample from the touch screen controller.
  *
- * To get sample data call ndk_touch_get_sample.
+ * This is referred as direct mode.
+ *
+ * To get the actual sample data call ndk_touch_get_sample.
  */
 void ndk_touch_request_sample(void);
 
@@ -223,7 +226,7 @@ int ndk_touch_calculate_transform(struct touch_xform *xform,
  * This function takes raw touch data and converts it into pixel coordinates
  * using the set coordinate transform.
  *
- * NOTE: Result and raw can point to the same object. ie. inplace conversion is
+ * NOTE: Result and raw can point to the same object. i.e. inplace conversion is
  * possible.
  *
  * @param[out] result
@@ -233,7 +236,7 @@ void ndk_touch_transform_into_screen_coords(struct touch_pos *result,
 											struct touch_pos *raw);
 
 /**
- * Read one touch sample.
+ * Read one touch sample in direct mode.
  *
  * This call will block until a touch sample is available. First call
  * ndk_touch_request_sample to request a sample from the touch screen

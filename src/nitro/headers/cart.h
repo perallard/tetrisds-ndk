@@ -14,7 +14,7 @@
  * *But* note however that the file API works just fine on all the flash carts
  * in the matrix above.
  *
- * NOTE: Cart ROM data reads are handled on the ARM9 side ie. no IPC
+ * NOTE: Cart ROM data reads are handled on the ARM9 side i.e. no IPC
  * communication involved.
  */
 #ifndef CART_INCLUDE_FILE

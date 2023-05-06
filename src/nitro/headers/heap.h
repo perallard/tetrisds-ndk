@@ -73,7 +73,7 @@ extern void *MAIN_area_start;
  * If DTCM_area_size < 0 then you specify how much memory the area is allowed
  * to use and the rest is allocated to user/supervisor stack.
  *
- * The default is zero ie. all remaining memory is allocated to the
+ * The default is zero i.e. all remaining memory is allocated to the
  * user/supervisor stack. Giving a default stack size of about 15Kb.
  *
  * This value should not be altered in SW instead patch the ARM9 binary to the

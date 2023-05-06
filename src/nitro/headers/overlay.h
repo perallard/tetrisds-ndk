@@ -1,5 +1,7 @@
 /**
- * Overlay functions
+ * Overlay functions.
+ *
+ * TODO: explain what overlays are used for.
  */
 #ifndef OVERLAY_INCLUDE_FILE
 #define OVERLAY_INCLUDE_FILE
