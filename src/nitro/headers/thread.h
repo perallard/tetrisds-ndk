@@ -4,17 +4,22 @@
  * The thread system seem to be based upon events. That is events like
  * interrupt requests and timeouts will preempt the current thread. But all
  * threads should yield or exit when there is no more processing to be done,
- * to let lower priority threads to resume their execution.
- *
- * This module/logical unit also includes a mutex API.
+ * to let lower priority thread execute or preempted threads resume their
+ * execution.
  *
  * NOTE: To have a thread suspend until a specific IRQ event see
  * ndk_thread_wait_irq in interrupts.h
  *
- * NOTE: At every context switch the thread priority list is always searched
+ * When a new thread is created it's added to an internal list or queue. The
+ * list or queue is kept sorted in priority order. A priority of zero (0) has
+ * the highest priority and the lowest priority is 31.
+ *
+ * NOTE: At every context switch the scheduler searches the priority list/queue
  * from the begining for the first pending thread to run. This implementation
  * does not scale well to many threads! So design your program to use as few
  * threads as possible at one time.
+ *
+ * NOTE: This module/logical unit also includes a mutex API.
  */
 #ifndef THREAD_INCLUDE_FILE
 #define THREAD_INCLUDE_FILE
@@ -109,7 +114,7 @@ struct thread {
   int status;                       // 0x64
   /*
    * List of all threads sorted in priority order. This is the list that is
-   * used by the scheduler to select what thread should run.
+   * used by the scheduler to select what thread should run next.
    */
   struct thread *priority_next;     // 0x68
   int id;                           // 0x6c
@@ -196,15 +201,17 @@ extern struct thread main_thread;
  * This thread will resume execution when all other threads have suspended
  * their execution. It will halt the CPU and wait for an IRQ in an endless
  * loop. It is probably a good idea to let the idle thread run when no
- * processing needs to be done as it will save some power. It has priority
- * 31.
+ * processing needs to be done as it will save some power. I.e. when there is
+ * no more work to be done in the game loop call ndk_thread_wait_irq.
+ *
+ * This thread has priority 31.
  */
 extern struct thread idle_thread;
 
 /**
  * Query if the thread subsystem has been initialised.
  *
- * @return true if thread subsystem has been initialized otherwize false.
+ * @return true if thread subsystem has been initialized otherwise false.
  */
 bool ndk_thread_is_subsystem_initialized();
 
@@ -257,7 +264,7 @@ int ndk_thread_get_priority(struct thread *t);
  *
  * @param t
  * @param priority
- * @return true on success, false otherwize
+ * @return true on success, false otherwise
  */
 bool ndk_thread_set_priority(struct thread *t, int priority);
 
@@ -286,15 +293,19 @@ void ndk_thread_switch(void);
 struct thread *ndk_thread_get_pending(void);
 
 /**
- * Set a thread as pending and resume the next thread according to the priority
- * list.
+ * Execute a thread.
+ *
+ * Sets the thread as pending and resumes the next thread according to the
+ * priority list.
  *
  * @param t
  */
 void ndk_thread_run(struct thread *t);
 
 /**
- * Set a list of threads as pending and resume the next thread according to the
+ * Execute a list of threads.
+ *
+ * Sets a list of threads as pending and resume the next thread according to the
  * priority list.
  *
  * Every thread in the list is popped from the list and set as pending in the
