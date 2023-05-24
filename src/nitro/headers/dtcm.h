@@ -19,7 +19,7 @@
  * list. All threads in this list will be scheduled to be executed after the
  * next IRQ. See itcm.h for more details.
  */
-extern struct thread_list pending_irq_thread_list;
+extern struct thread_list waiting_irq_thread_list;
 
 /**
  * A vector containing handlers for all IRQ sources. To alter it call

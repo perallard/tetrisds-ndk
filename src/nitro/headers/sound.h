@@ -14,8 +14,9 @@
  * 2) All music and sound effects are in a special format called a Sound
  *    sequence (SEQ), think Midi.
  *
- * 3) Sound sequences (SEQ) are added as audio sources for playback using the
- *    'ndk_sound_add_source_seq' and 'ndk_sound_add_source_seqarc' functions.
+ * 3) Sound sequences (SEQ) are added to a list of audio sources for playback
+ *    using the 'ndk_sound_add_source_seq' and 'ndk_sound_add_source_seqarc'
+ *    functions.
  *
  * 4) Added audio sources will only start playing after 'ndk_sound_process' has
  *    been called.
@@ -46,6 +47,9 @@
  *
  * struct sound_arch *arch;
  * ndk_sound_open_sdat_archive(arch, "/my_sound_arch.sdat", snd_heap, false);
+ *
+ * // opened it set as the current SDAT archive so from now on there is no need
+ * // to pass around a reference to is when calling the library functions.
  *
  * // initialize players using player data defined in the SDAT archive.
  * ndk_sound_sdat_init_seq_players(snd_heap);
@@ -385,8 +389,8 @@ struct sound_stream_handler_thread {
 /**
  * This structure contains the local and global player variables. Every player
  * has 16 local variables of 16 bits each. And there are an additional 16
- * global variables of 16 bits each. The global variables can be read by all
- * the players.
+ * global variables of 16 bits each. The global variables are shared by all
+ * players.
  *
  * NOTE: All state in this structure is read/written to by the ARM7 which
  * handles all sound playback.
@@ -781,8 +785,9 @@ bool ndk_sound_open_sdat_archive(struct sound_sdat_arch *arch, char *filename,
 /**
  * Load the SDAT header.
  *
- * Read the SDAT header and optionally read the FAT, Info and Symbol
- * blocks.
+ * Read the SDAT header and optionally read the FAT, Info and Symbol blocks.
+ * The blocks are stored in memory allocated from the supplied heap using an
+ * hardcoded heap id of 0.
  *
  * NOTE: Helper function for ndk_sound_open_sdat_archive.
  *
@@ -844,9 +849,12 @@ void ndk_sound_sdat_heap_free(struct sound_sdat_heap *heap, int heap_id);
 /**
  * Create an heap id to group allocations with.
  *
- * Note: All subsequent allocations will use this id until another call to this
+ * All subsequent allocations will use this id until another call to this
  * function is made. Use this function to group allocations. Which can then
  * later be freed using a single ndk_sound_sdat_heap_free.
+ *
+ * NOTE: A heap id of zero (0) is reseved for data allocated by the open sdat
+ * archive function.
  *
  * @param heap
  * @return newly created heap_id or -1 if operation failed.

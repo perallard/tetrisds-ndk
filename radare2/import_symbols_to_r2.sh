@@ -1,10 +1,10 @@
 #!/bin/bash
-
+#
 # Only run this script on a newly created radare2 project. It will import all
 # symbols into the project. It does not however check if the symbols are
 # already refined.
-
-# $1 path to symbols.txt
+#
+# $1 path to the symbols.txt file
 # $2 radare project name
 
 commands=""

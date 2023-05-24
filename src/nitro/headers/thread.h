@@ -1,11 +1,11 @@
 /**
  * Thread API.
  *
- * The thread system seem to be based upon events. That is events like
- * interrupt requests and timeouts will preempt the current thread. But all
- * threads should yield or exit when there is no more processing to be done,
- * to let lower priority thread execute or preempted threads resume their
- * execution.
+ * The thread system seem to be based around tasks and events. Upon a certain
+ * event, like an interrupt request or a timeout, a task can be scheduled to be
+ * performed. When it's done processing it must explicitly yield to give other
+ * tasks an opportunity to (continue to) execute. Only interrupts and timeouts
+ * can preempt a current thread/task.
  *
  * NOTE: To have a thread suspend until a specific IRQ event see
  * ndk_thread_wait_irq in interrupts.h
@@ -15,7 +15,7 @@
  * the highest priority and the lowest priority is 31.
  *
  * NOTE: At every context switch the scheduler searches the priority list/queue
- * from the begining for the first pending thread to run. This implementation
+ * from the begining for the first scheduled thread to run. This implementation
  * does not scale well to many threads! So design your program to use as few
  * threads as possible at one time.
  *
@@ -110,7 +110,7 @@ struct mutex {
 
 struct thread {
   struct context ctx;
-  // 0 = stopped/paused, 1 = running/pending, 2 = removed
+  // 0 = waiting, 1 = scheduled, 2 = removed
   int status;                       // 0x64
   /*
    * List of all threads sorted in priority order. This is the list that is
@@ -125,24 +125,24 @@ struct thread {
   int unk3;                         // 0x74
   /*
    * If a thread is stopped using ndk_thread_yield with a non-null argument.
-   * pending_list will point to the supplied list and the prev and next fields
-   * in pending_node will reflect this threads position in the list. The list
+   * waiting_list will point to the supplied list and the prev and next fields
+   * in waiting_node will reflect this threads position in the list. The list
    * is kept sorted in priority order.
    */
-  struct thread_list *pending_list; // 0x78
-  struct thread_list_node *pending_node;  // 0x7c
+  struct thread_list *waiting_list; // 0x78
+  struct thread_list_node *waiting_node;  // 0x7c
   /*
    * If non-null points to the current mutex this thread is blocked at.
    */
   struct mutex *blocked_at;         // 0x84
   /*
-   * If held_by_me.first is non-null this thread holds one of more mutexes.
+   * If held_by_me.first is non-null this thread holds one or more mutexes.
    */
   struct mutex_list *held_by_me;    // 0x88
   void *stack_bottom;               // 0x90
   void *stack_top;                  // 0x94
   int unk12;                        // 0x98
-  struct thread_list deleted_pending_list;   // 0x9c
+  struct thread_list deleted_waiting_list;   // 0x9c
   int unk15[3];                     // 0xa4
   void *unk16;                      // 0xb0
   /*
@@ -156,7 +156,7 @@ struct thread {
   // 0xc0
 };
 
-// arguments (current, pending)
+// arguments (current, next)
 typedef void thread_switch_fn(struct thread *, struct thread *);
 
 /**
@@ -180,14 +180,14 @@ extern bool thread_subsystem_initialized;
 
 extern struct {
   /*
-   * bit 0 = has waiting threads in pending_irq_thread_list
+   * bit 0 = has waiting threads in waiting_irq_thread_list
    */
   short flags;                      // 0x00
   short flags2;                     // 0x02
   struct thread *current;           // 0x04
   // linked list of threads sorted in ascending priority order
   struct thread *priority_list;     // 0x08
-  // called before a pending thread is resumed
+  // called before a scheduled thread is resumed
   thread_switch_fn *pre_resume_fn;  // 0x0c
   // more ?
 } thread_base;
@@ -275,7 +275,7 @@ bool ndk_thread_set_priority(struct thread *t, int priority);
 void ndk_thread_push_back(void);
 
 /**
- * Suspend the current thread (this) and resume the next pending thread in
+ * Suspend the current thread (this) and resume the next scheduled thread in
  * priority order. Used by the other thread functions when a context switch is
  * required.
  *
@@ -290,45 +290,45 @@ void ndk_thread_switch(void);
  *
  * @return the thread
  */
-struct thread *ndk_thread_get_pending(void);
+struct thread *ndk_thread_get_scheduled(void);
 
 /**
  * Execute a thread.
  *
- * Sets the thread as pending and resumes the next thread according to the
+ * Sets the thread as scheduled and resumes the next thread according to the
  * priority list.
  *
  * @param t
  */
-void ndk_thread_run(struct thread *t);
+void ndk_thread_schedule(struct thread *t);
 
 /**
  * Execute a list of threads.
  *
- * Sets a list of threads as pending and resume the next thread according to the
- * priority list.
+ * Sets a list of threads as scheduled and resume the next thread according to
+ * the priority list.
  *
- * Every thread in the list is popped from the list and set as pending in the
- * priority list. So when this function returns the list will be empty.
+ * Every thread is popped from the list and set as scheduled in the priority
+ * list. So when this function returns the list will be empty.
  *
  * @param list
  */
-void ndk_thread_run_list(struct thread_list *list);
+void ndk_thread_schedule_list(struct thread_list *list);
 
 /**
- * Stop/pause the current thread and resume the next thread in the priority
- * list.
+ * Sets the current thread as waiting and resume the next scheduled thread in
+ * the priority list.
  * 
- * NOTE: To start the thread(s) again call ndk_thread_run or
- * ndk_thread_run_list.
+ * NOTE: To start the thread(s) again call ndk_thread_schedule or
+ * ndk_thread_schedule_list.
  *
- * @param pending_list if it's non-null this thread will be inserted in the
+ * @param waiting_list if it's non-null this thread will be inserted in the
  * list in priority order.
  */
-void ndk_thread_yield(struct thread_list *pending_list);
+void ndk_thread_yield(struct thread_list *waiting_list);
 
 /**
- * Check if thread has been marked as removed from the priority queue
+ * Check if thread has been marked as removed from the priority list
  *
  * @param t
  * @return true if it has been removed, false otherwise.
@@ -336,9 +336,9 @@ void ndk_thread_yield(struct thread_list *pending_list);
 bool ndk_thread_has_been_removed(struct thread *t);
 
 /**
- * Remove a thread from the priority list. It's also removed from the pending
- * list, if it's assigned to one. If the thread is the current one switch to
- * the next pending thread in the priority list.
+ * Remove a thread from the priority list. It's also removed from the waiting
+ * list, if it's assigned to one. If the thread is the current one, switch to
+ * the next scheduled thread in the priority list.
  *
  * @param t
  */
@@ -408,7 +408,7 @@ void ndk_thread_add_to_priority_list(struct thread *t);
 struct mutex *ndk_mutex_list_pop(struct mutex_list *list);
 
 /**
- * Remove a thread from a pending list.
+ * Remove a thread from a waiting list.
  *
  * NOTE: Helper function. Don't call directly.
  *
@@ -416,24 +416,24 @@ struct mutex *ndk_mutex_list_pop(struct mutex_list *list);
  * @param t
  * @return null if the thread wasn't found
  */
-struct thread *ndk_thread_remove_from_pending_list(struct thread_list *list,
+struct thread *ndk_thread_remove_from_waiting_list(struct thread_list *list,
                                                    struct thread *t);
 
 /**
- * Remove the first element from a pending list.
+ * Remove the first element from a waiting list.
  *
  * @param list
  * @return a thread or null if the list was empty
  */
-struct thread *ndk_thread_pop_from_pending_list(struct thread_list *list);
+struct thread *ndk_thread_pop_from_waiting_list(struct thread_list *list);
 
 /**
- * Add a thread to the pending list. All threads are added by priority order.
+ * Add a thread to the waiting list. All threads are added by priority order.
  *
  * @param list
  * @param t
  */
-void ndk_thread_add_to_pending_list(struct thread_list *list,
+void ndk_thread_add_to_waiting_list(struct thread_list *list,
                                     struct thread *t);
 
 /**

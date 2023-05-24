@@ -1,15 +1,20 @@
 
+Crt0 sections table in the arm9 binary.
 0x02000b4c:
-    0x01ff8000, 0x620
-    0x0
-    0x027c0000, 0x60
-    0x0
+   0x020a5a00  <-- section info array start
+   0x020a5a18  <-- section info array end
+   0x020a5380 <-- section data start
 
-    0x20a5380 <-- data start
+Format is address, text/data size, bss size.
+0x020a5a00:
+    0x01ff8000, 0x620, 0x0 <-- ITCM
+    0x027c0000, 0x60, 0x0 <-- DTCM
 
-Mapping the ITCM block:
+Mapping the ITCM and DTCM blocks:
 vaddr is the run-time address
-padder is the offset in the file (ARM9 binary)
+padder is the offset in the ROM file. Note since the loadable region in the ROM
+starts at 0x4000. Formula to get the ROM file address from RAM address is:
+   ROM address = RAM address - 0x02000000 + 0x4000
 
    fd   vaddr       size    padder  flags    name
 om 3    0x01ff8000  0x620   0xa9380 rwx      fmap.arm9.itcm
@@ -23,5 +28,5 @@ Mapping the overlays:
 overlay_info structures (see overlay.h)
 3) open the overlay file using the 'o' command. Use the 'o' commands to get
    file descriptor of the overlay file.
-3) map the sections using the above 'om' command. Example mapping overlay 4:
-  om 4 0x213a160 0x1c60 0x0 r-x fmap.overlay9_4
+4) map the sections using the above 'om' command. Example mapping overlay 4:
+   om 4 0x213a160 0x1c60 0x0 r-x fmap.overlay9_4
