@@ -39,7 +39,7 @@ static struct terminal term_base;
 
 static inline unsigned short *term_get_screen_buf_location(int x, int y)
 {
-	return &term_base.screen_buf[x + y * TERM_COLS];
+  return &term_base.screen_buf[x + y * TERM_COLS];
 }
 
 void term_init(unsigned short *char_data_loc, unsigned short *screen_data_loc,
@@ -92,7 +92,7 @@ void term_draw()
 {
   ndk_cpu_clean_dcache_lines(term_base.screen_buf, TERM_MAP_SIZE * 2);
 
-	ndk_memory_dma_16bit_copy(term_base.dma_channel, term_base.screen_buf,
+  ndk_memory_dma_16bit_copy(term_base.dma_channel, term_base.screen_buf,
                             term_base.screen_data_loc, TERM_MAP_SIZE * 2);
 }
 
@@ -121,12 +121,12 @@ void term_set_cursor(int x, int y)
 
 void term_prints(const char *s)
 {
-	char c = *s++;
+  char c = *s++;
 
-	while (c != '\0') {
-		term_printc(c);
-		c = *s++;
-	}
+  while (c != '\0') {
+    term_printc(c);
+    c = *s++;
+  }
 }
 
 void term_printc(char c)
@@ -145,15 +145,15 @@ void term_printc(char c)
 
 void term_line_feed()
 {
-	term_base.x = 0;
+  term_base.x = 0;
 
-	int curr_y = term_base.y;
+  int curr_y = term_base.y;
 
-	if (curr_y < TERM_LAST_ROW) {
-		term_base.y = curr_y + 1;
-	} else {
-		term_scroll_up();
-	}
+  if (curr_y < TERM_LAST_ROW) {
+    term_base.y = curr_y + 1;
+  } else {
+    term_scroll_up();
+  }
 }
 
 void term_clear_line(int y)
@@ -161,7 +161,7 @@ void term_clear_line(int y)
   if (y < TERM_FIRST_ROW || y > TERM_LAST_ROW)
     return;
 
-	unsigned short *last = term_get_screen_buf_location(0, y);
+  unsigned short *last = term_get_screen_buf_location(0, y);
   unsigned int tile = term_base.palette << 12 | ' ';
 
   tile |= tile << 16;
@@ -171,8 +171,8 @@ void term_clear_line(int y)
 
 void term_scroll_up()
 {
-	unsigned short *src = term_get_screen_buf_location(0, 1);
-	unsigned short *dst = term_get_screen_buf_location(0, 0);
+  unsigned short *src = term_get_screen_buf_location(0, 1);
+  unsigned short *dst = term_get_screen_buf_location(0, 0);
 
   ndk_memory_fast_32bit_copy(src, dst, TERM_COLS * (TERM_ROWS - 1) * 2);
 
@@ -186,7 +186,7 @@ void term_draw_character(char c)
   if (c < 32 || c >= 127)
     cc = ' ';
 
-	unsigned short *p = term_get_screen_buf_location(term_base.x, term_base.y);
+  unsigned short *p = term_get_screen_buf_location(term_base.x, term_base.y);
 
   *p = term_base.palette << 12 | cc;
 }
