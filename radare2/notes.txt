@@ -3,29 +3,42 @@ Crt0 sections table in the arm9 binary.
 0x02000b4c:
    0x020a5a00  <-- section info array start
    0x020a5a18  <-- section info array end
-   0x020a5380 <-- section data start
+   0x020a5380  <-- section data start
 
-Format is address, text/data size, bss size.
+Entries in the array has the folloing format:
+   { u32 address, u32 text_data_size, u32 bss_size }
+
+Contents of the array is:
 0x020a5a00:
-    0x01ff8000, 0x620, 0x0 <-- ITCM
-    0x027c0000, 0x60, 0x0 <-- DTCM
+    0x01ff8000, 0x620, 0x0 <-- ITCM section
+    0x027c0000, 0x60, 0x0  <-- DTCM section
 
-Mapping the ITCM and DTCM blocks:
+Mapping the ITCM and DTCM blocks in radare2:
+
+Use the 'om' commmand. It will print the currently mapped memory regions. Note
+the fd (file descriptor number). Assume fd is 3. Execute the following commands
+
+om    3    0x01ff8000  0x620   0xa9380 rwx      fmap.arm9.itcm
+om    3    0x027c0000  0x60    0xa99a0 rw       fmap.arm9.dtcm
+
+      fd   vaddr       size    padder  flags    name
+
+fd is the file descriptor for the ARM9 binary. It's mapped automatically if you
+started radare2 with the ROM as input file.
+
 vaddr is the run-time address
+
 padder is the offset in the ROM file. Note since the loadable region in the ROM
 starts at 0x4000. Formula to get the ROM file address from RAM address is:
    ROM address = RAM address - 0x02000000 + 0x4000
 
-   fd   vaddr       size    padder  flags    name
-om 3    0x01ff8000  0x620   0xa9380 rwx      fmap.arm9.itcm
-
-Mapping the DTCM block:
-om 3    0x027c0000  0x60    0xa99a0 rw       fmap.arm9.dtcm
+flags read, write and execute. I don't know if they matter much when reversing.
 
 Mapping the overlays:
-1) extract the overlay files
-2) extract the overlay table. The overlay table is an array of
-overlay_info structures (see overlay.h)
+
+1) extract the overlay files. This can be done using the ndstool.
+2) extract the overlay table. The overlay table is an array of overlay_info
+   structures (see overlay.h)
 3) open the overlay file using the 'o' command. Use the 'o' commands to get
    file descriptor of the overlay file.
 4) map the sections using the above 'om' command. Example mapping overlay 4:

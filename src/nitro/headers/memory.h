@@ -10,6 +10,8 @@
  *
  * NOTE: When the function blocks to wait for an ongoing transfer IRQs (CPSR)
  * are disabled. So all threads and IRQ handlers are blocked from executing.
+ *
+ * NOTE: Parts of this module also resides in ITCM.
  */
 #ifndef MEMORY_INCLUDE_FILE
 #define MEMORY_INCLUDE_FILE

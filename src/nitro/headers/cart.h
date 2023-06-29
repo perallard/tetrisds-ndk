@@ -85,7 +85,7 @@ extern struct cart_read_buf cart_read_buffer;
  * Used by low level cart routines.
  *
  * Used when transfering cart ROM and backup data. The worker thread used has
- * priority 4. Any word that should have higher priority that cart transfers
+ * priority 4. Any work that should have higher priority than cart transfers
  * should thus have priority 5 or higher. Main has priority 10 for instance.
  *
  * size unknown
@@ -228,10 +228,10 @@ void ndk_cart_cpu_read_data(struct cart_read_buf *tmp);
  * Read data from cart using DMA.
  *
  * This function will set up a cart transfer complete IRQ handler and start
- * a DMA read by calling ndk_start_dma_read. The IRQ handler will in trun
+ * a DMA read by calling ndk_cart_start_dma_read. The IRQ handler will in trun
  * check if more data needs to be transfered, if so start a new DMA read by
- * calling ndk_start_dma_read again and agina until there is no more bytes to
- * be transfered.
+ * calling ndk_cart_start_dma_read again and again until there is no more bytes
+ * to be transfered.
  *
  * NOTE: For the IRQ handler see ndk_cart_dma_read_complete_irq_handler.
  *

@@ -1,4 +1,4 @@
-Boot:
+At boot:
   ARM9 binary loaded at 0x02000000
   ARM7 binary loaded at 0x02380000
 
@@ -7,7 +7,7 @@ ARM9:
 
   ARM9.crt0 sets up the memory regions
   for ARM7 also, init the memory as shown
-  below then jumps to 0x02000c10 (program main)
+  below then jumps to 0x02000c10 (main)
 
 ITCM:
   0x01ff8000 - 0x01ff8620 ARM9 interrupt handling
@@ -76,7 +76,7 @@ ARM9 'Firmware' memory layout (main RAM):
              - 0x020a537f end of static firmware image
 
 
-ARM9 section locations
+ARM9 section locations (at run-time)
   0x02000800 - 0x0205a0cf text        ~90k ARM instructions
     0x02026500 - 0x02051000 text Tetris game
 
@@ -124,10 +124,9 @@ SDK subsystem dependency map (not complete)
     math: none
     interrupts: thread
     ipc: interrupts, thread (critical section)
-    memory: cpu, DMA (HW)
-    nds: all??
+    memory: cpu, DMA, itcm
+    nds: all?
     overlay: file
     sound: file, thread, ipc
-    thread: cpu, interrupts, timers
+    thread: cpu, interrupts, timers, ITCM
     touch: math, interrupts, thread, cpu
-

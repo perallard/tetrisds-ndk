@@ -2,7 +2,7 @@
  * DTCM
  *
  * TODO: Explain how this data is copied from the firmware in main RAM to
- * ITCM.
+ * DTCM.
  *
  * NOTE: Except for the data defined below all DTCM memory is allocated for
  * stack usage. It's possible to alter this configuration, see DTCM_area_size
