@@ -322,8 +322,8 @@ void ndk_thread_schedule_list(struct thread_list *list);
  * NOTE: To start the thread(s) again call ndk_thread_schedule or
  * ndk_thread_schedule_list.
  *
- * @param waiting_list if it's non-null this thread will be inserted in the
- * list in priority order.
+ * @param waiting_list if it's non-null this thread will be inserted in a
+ * waiting list in priority order.
  */
 void ndk_thread_yield(struct thread_list *waiting_list);
 

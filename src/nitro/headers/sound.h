@@ -1,7 +1,7 @@
 /**
  * Sound (SDAT) API.
  *
- * TODO: Document what can an can't be done using the reversed API in its
+ * TODO: Document what can and can't be done using the reversed API in its
  * current state.
  *
  * Some notes on how the API for the Sound Archive (SDAT) works.
@@ -28,6 +28,8 @@
  *    is playing and another sound source is added that uses the same player
  *    it will replace the old one.
  *
+ * 7) All sequence and stream playback is done by the ARM7.
+ * 
  * See: http://www.feshrine.net/hacking/doc/nds-sdat.php
  * See: https://gota7.github.io/NitroStudio2/specs/soundData.html
  * See: http://www.feshrine.net/hacking/doc/nds-sdat.php
@@ -1104,6 +1106,8 @@ void ndk_sound_create_sdat_worker_thread(void *unk0, int priority);
  *
  * Should called be after ndk_sound_open_sdat_archive to setup all stream
  * players for subsequent play back.
+ * 
+ * NOTE: The game calls this function with a priority value of 10.
  *
  * @param priority priority of the stream worker thread
  * @param heap

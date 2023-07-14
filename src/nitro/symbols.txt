@@ -188,6 +188,7 @@ ndk_file_open=0x0200bd08,function,global
 ndk_file_open_by_fat_id=0x0200bd50,function,global
 ndk_file_open_by_rom_range=0x0200bdcc,function,global
 ndk_fat_get_fat_id_from_filename=0x0200be1c,function,global
+ndk_file_read_impl=0x0200be5c,function,global
 ndk_file_init_handle=0x0200c034,function,global
 ndk_fat_mounted=0x0200c064,function,global
 ndk_fat_mount=0x0200c074,function,global
@@ -366,6 +367,8 @@ static_initializer_array=0x02020440,object,global
 fix_trig_table=0x205a0d0,object,global
 # used by the ndk_fix_atan2 function
 fix_angle_table=0x0205e0d0,object,global
+
+file_fn_array=0x0205e618,object,global
 
 # string(wchar) pool
 # 0x0205f11a - 0x0208d74a

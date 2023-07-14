@@ -21,7 +21,8 @@
  *
  * See: https://problemkaputt.de/gbatek.htm#dscartridgenitroromandnitroarcfilesystems
  */
-struct fat_entry {
+struct fat_entry
+{
   int ROM_start;
   int ROM_end;
 };
@@ -38,14 +39,21 @@ struct fnt_entry;
  *
  * size: 72 bytes
  */
-struct file {
-  int unk_0x00;               // 0x00
-  int unk_0x04;               // 0x04
-  struct fat_volume *volume;   // 0x08
-  int unk_0x0c;               // 0x0c
+struct file
+{
+  int unk_0x00;              // 0x00
+  int unk_0x04;              // 0x04
+  struct fat_volume *volume; // 0x08
+  /*
+   * bit 0 : 0 == done, 1 == ongoing ?
+   * bit 1 : ?
+   * bit 2 : 0 == async, 1 == blocking
+   * bit 6 : 1 == busy ?
+   */
+  unsigned int flags;         // 0x0c
   int unk_0x10;               // 0x10
   int unk_0x14;               // 0x14
-  struct thread_list pending; // 0x18
+  struct thread_list waiting; // 0x18
   int FAT_id;                 // 0x20
   int start_offset;           // 0x24
   int end_offset;             // 0x28
@@ -55,10 +63,10 @@ struct file {
   /**
    * Will be end_offset - current_offset or count
    */
-  int real_count;             // 0x38
-  int unk_0x3c;               // 0x3c
-  int unk_0x40;               // 0x40
-  int unk_0x44;               // 0x44
+  int real_count; // 0x38
+  int unk_0x3c;   // 0x3c
+  int unk_0x40;   // 0x40
+  int unk_0x44;   // 0x44
   // 0x48
 };
 
@@ -69,7 +77,8 @@ struct file {
  *
  * NOTE: volume should always be equal to fat_volume (see below).
  */
-struct fat_handle {
+struct fat_handle
+{
   struct fat_volume *volume;
   int id;
 };
@@ -91,31 +100,42 @@ extern unsigned int fat_dma_channel;
  *
  * size: unknown
  */
-extern struct fat_volume {
-  char name[4];           // 'rom\0'
-  int unk0;               // 0x4
-  int unk1;               // 0x8
-  struct thread_list pending;     // 0xc
-  int unk4;               // 0x14
-  int unk5;               // 0x18
-  int unk6;               // 0x1c
-  int unk7;               // 0x20
-  struct file *unk8;      // 0x24
-  int unk9;               // 0x28
-  struct fat_entry *fat;  // 0x2c
-  int fat_table_size;     // 0x30
-  struct fnt_entry *fnt;  // 0x34
-  int fnt_table_size;     // 0x38
-  int fat_rom_offset;     // 0x3c
-  int fnt_rom_offset;     // 0x40
-  void *cache;            // 0x44
-  int (*fn_1)(int, int ,int); // 0x48
-  int (*fn_2)();              // 0x4c
-  int (*fn_3)(int, int, int); // 0x50
-  int (*fn_4)(void *, int);   // 0x54
-  int unk10;                  // 0x58
+extern struct fat_volume
+{
+  char name[4];               // 'rom\0'
+  int unk0;                   // 0x4
+  int unk1;                   // 0x8
+  struct thread_list pending; // 0xc
+  int unk4;                   // 0x14
+  int unk5;                   // 0x18
+  int unk6;                   // 0x1c
+  int unk7;                   // 0x20
+  struct file *unk8;          // 0x24
+  int unk9;                   // 0x28
+  struct fat_entry *fat;      // 0x2c
+  int fat_table_size;         // 0x30
+  struct fnt_entry *fnt;      // 0x34
+  int fnt_table_size;         // 0x38
+  int fat_rom_offset;         // 0x3c
+  int fnt_rom_offset;         // 0x40
+  void *cache;                // 0x44
+  /* Set to a function that calls ndk_cart_read in ndk_fat_mount */
+  int (*fn_1)(int, int, int); // 0x48
+  /* Set to a function that just returns 1 in ndk_fat_mount */
+  int (*fn_2)(); // 0x4c
+  /* Set to the same as fn_1 in ndk_fat_mount */
+  int (*fn_3)(int, int, int);      // 0x50
+  int (*fn_4)(struct file *, int); // 0x54
+  int unk10;                       // 0x58
   // more ?
 } fat_volume;
+
+/* An array of file IO functions. Used by fcn.0200a3f0. What is important here
+ * is the fact that some of them use the fn_X function in the fat_volume
+ * structure. fcn.0200a3f0 seen to be of great importance as it's called from
+ * all over.
+ */
+extern int (*file_fn_array[9])(struct file *);
 
 /**
  * Init file system.
@@ -173,6 +193,8 @@ bool ndk_file_seek(struct file *h, int offset, int whence);
 /**
  * Read data from file.
  *
+ * NOTE: Calls ndk_file_read_impl with async = false
+ *
  * NOTE: To read the entire file without knowing the file size set count to
  * MAX_INT.
  *
@@ -187,6 +209,18 @@ bool ndk_file_seek(struct file *h, int offset, int whence);
  * @return number of bytes read or -1 if the read operation failed.
  */
 int ndk_file_read(struct file *h, void *dest, int count);
+
+/**
+ * Internal implementation of file read.
+ *
+ * @param h the file handle
+ * @param dest the memory location the read data is to be stored
+ * @param count the number of bytes to read
+ * @param async Continue to execute or block until all bytes are read.
+ * @return number of bytes read or -1 if the read operation failed. In the async
+ * case count is always returned.
+ */
+int ndk_file_read_impl(struct file *h, void *dest, int count, bool async);
 
 /**
  * Open file.

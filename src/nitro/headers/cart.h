@@ -85,8 +85,7 @@ extern struct cart_read_buf cart_read_buffer;
  * Used by low level cart routines.
  *
  * Used when transfering cart ROM and backup data. The worker thread used has
- * priority 4. Any work that should have higher priority than cart transfers
- * should thus have priority 5 or higher. Main has priority 10 for instance.
+ * priority 4.
  *
  * size unknown
  */
@@ -119,7 +118,7 @@ extern struct cart
   struct thread *unk20;  // 0x104
   int worker_thread_priority;   // 0x108 #4
   // if a transfer is alreay ongoing the threads gets parked here
-  struct thread_list pending; // 0x10c
+  struct thread_list waiting; // 0x10c
   // bit 0: 1 == cart subsystem initialized
   // bit 1: ?
   // bit 2: 1 == transfer ongoing | busy
@@ -133,8 +132,8 @@ extern struct cart
 } cart_state;
 
 /**
- * Sets a handler function that is to be executed when the cart thread is
- * awoken.
+ * Sets a handler function that is to be executed in ndk_cart_thread_fcn.
+ * It also wakes the cart worker thread.
  *
  * NOTE: Most likely a helper function.
  */
@@ -179,6 +178,11 @@ void ndk_cart_read(unsigned dma_channel, unsigned int src, void *dst,
 
 /**
  * This is the worker function that run in the cart thread.
+ * 
+ * It checks if a handler function has be set, see
+ * ndk_cart_thread_set_handler_and_start. If it has been set executes it else
+ * it yields, in an endless loop. Once it has yelded it is only awoken again
+ * by a call to ndk_cart_thread_set_handler_and_start.
  */
 void ndk_cart_thread_fcn(void);
 
