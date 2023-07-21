@@ -44,14 +44,24 @@ struct file
   int unk_0x00;              // 0x00
   int unk_0x04;              // 0x04
   struct fat_volume *volume; // 0x08
-  /*
+  /**
    * bit 0 : 0 == done, 1 == ongoing ?
    * bit 1 : ?
    * bit 2 : 0 == async, 1 == blocking
    * bit 6 : 1 == busy ?
    */
   unsigned int flags;         // 0x0c
-  int unk_0x10;               // 0x10
+  /**
+   * NOTE: Internal state information, no need to set it directly.
+   *
+   * What type of IO operation will be performed when using this file handle
+   * 0 == read using ndk_cart_read (via file_fn_array)
+   * 6 == open by FAT id
+   * 7 == open by ROM range
+   * 8 == close
+   * 14 == no operation. Set by ndk_file_init_handle and ndk_file_close
+   */
+  int operation;              // 0x10
   int unk_0x14;               // 0x14
   struct thread_list waiting; // 0x18
   int FAT_id;                 // 0x20
@@ -119,7 +129,7 @@ extern struct fat_volume
   int fat_rom_offset;         // 0x3c
   int fnt_rom_offset;         // 0x40
   void *cache;                // 0x44
-  /* Set to a function that calls ndk_cart_read in ndk_fat_mount */
+  /* Set to a function that calls ndk_cart_read by ndk_fat_mount */
   int (*fn_1)(int, int, int); // 0x48
   /* Set to a function that just returns 1 in ndk_fat_mount */
   int (*fn_2)(); // 0x4c
@@ -130,12 +140,23 @@ extern struct fat_volume
   // more ?
 } fat_volume;
 
-/* An array of file IO functions. Used by fcn.0200a3f0. What is important here
- * is the fact that some of them use the fn_X function in the fat_volume
- * structure. fcn.0200a3f0 seen to be of great importance as it's called from
- * all over.
+/**
+ * An array of file IO functions. Used by ndk_file_central_dispatch. What is
+ * important here is the fact that some of them use the fn_X function in the
+ * fat_volume structure. ndk_file_central_dispatch seen to be of great
+ * importance as it's called from all over.
  */
 extern int (*file_fn_array[9])(struct file *);
+
+/**
+ * Used to perform different types of IO operations.
+ *
+ * NOTE: There might be no need to call this function directly. It's defined
+ * here only for reference.
+ *
+ * @return status
+ */
+int ndk_file_central_dispatch(struct file *h, int operation);
 
 /**
  * Init file system.
@@ -193,15 +214,15 @@ bool ndk_file_seek(struct file *h, int offset, int whence);
 /**
  * Read data from file.
  *
- * NOTE: Calls ndk_file_read_impl with async = false
- *
- * NOTE: To read the entire file without knowing the file size set count to
- * MAX_INT.
- *
  * NOTE: This function is blocking and will only return when all bytes have
  * been read (or on failure). But it is interruptable so threads that wait for
  * events like IRQs of timeouts etc. can execute provided they have a priority
  * that is higher than 4.
+ *
+ * NOTE: To read the entire file without knowing the file size set count to
+ * MAX_INT.
+ *
+ * NOTE: Calls ndk_file_read_impl with async = false
  *
  * @param h the file handle
  * @param dest the memory location the read data is to be stored
@@ -212,6 +233,8 @@ int ndk_file_read(struct file *h, void *dest, int count);
 
 /**
  * Internal implementation of file read.
+ *
+ * NOTE: Currently unknown if async can be used for something useful.
  *
  * @param h the file handle
  * @param dest the memory location the read data is to be stored

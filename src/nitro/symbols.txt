@@ -181,6 +181,7 @@ ndk_ipc_is_fifo_channel_allocated=0x0200a258,function,global
 ndk_ipc_allocate_fifo_channel=0x0200a280,function,global
 ndk_ipc_init_impl=0x0200a2e8,function,global
 
+ndk_file_central_dispatch=0x0200a3f0,function,global
 ndk_file_read=0x0200bba8,function,global
 ndk_file_seek=0x0200bb3c,function,global
 ndk_file_close=0x0200bcc8,function,global
