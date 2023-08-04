@@ -116,7 +116,8 @@ extern struct cart
   int unk16;             // 0xfc
   int unk17;             // 0x100
   struct thread *unk20;  // 0x104
-  int worker_thread_priority;   // 0x108 #4
+  // Set to 4 by ndk_cart_init
+  int worker_thread_priority;   // 0x108
   // if a transfer is alreay ongoing the threads gets parked here
   struct thread_list waiting; // 0x10c
   // bit 0: 1 == cart subsystem initialized

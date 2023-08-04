@@ -368,8 +368,12 @@ static_initializer_array=0x02020440,object,global
 fix_trig_table=0x205a0d0,object,global
 # used by the ndk_fix_atan2 function
 fix_angle_table=0x0205e0d0,object,global
-
+# size 36, 9 entries of pointer to functions
 file_fn_array=0x0205e618,object,global
+# size 16
+ima_adpcm_index_table=0x0205e9e8,object,global
+# size 89 * 2 = 178
+ima_adpcm_step_table=0x0205e9f8,object,global
 
 # string(wchar) pool
 # 0x0205f11a - 0x0208d74a

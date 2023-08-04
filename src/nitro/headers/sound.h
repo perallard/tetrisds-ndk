@@ -50,13 +50,10 @@
  * struct sound_arch *arch;
  * ndk_sound_open_sdat_archive(arch, "/my_sound_arch.sdat", snd_heap, false);
  *
- * // opened it set as the current SDAT archive so from now on there is no need
- * // to pass around a reference to is when calling the library functions.
- *
  * // initialize players using player data defined in the SDAT archive.
  * ndk_sound_sdat_init_seq_players(snd_heap);
  *
- * // sound data can now be loaded from the archive a played.
+ * // sound data can now be loaded from the archive.
  *
  * TODO: give an code example on how to play a sound data.
  */
@@ -95,10 +92,12 @@
  * These flags are OR'd to enable or disable automatic loading of dependent
  * files.
  *
- * For example sequence files usually are loaded with 7 this will load the bank
- * and wavearc files as well.
+ * For example sequence files are usually loaded with 7 this will load the seq
+ * file and also bank and wavearc files as well.
  *
- * NOTE: For seqarcs dependent files are *never* loaded.
+ * NOTE: For seqarcs dependent files are *never* loaded. Only the seqarc flag is
+ * considered. This is probably due to the fact that the sequences in the seqarc
+ * can depend on any number of banks and wavearcs in a non-tivial way.
  */
 #define SOUND_INFO_GROUP_FLAG_SEQ 1
 #define SOUND_INFO_GROUP_FLAG_BANK 2
@@ -315,9 +314,9 @@ struct sound_handle {
 };
 
 struct sound_player {
-  void *unk0; // 0x00
-  void *unk1; // 0x04
-  char unk2[28];                        // 0x08
+  void *unk0;                  // 0x00
+  void *unk1;                  // 0x04
+  char unk2[28];               // 0x08
   // 0x24
 };
 
@@ -371,9 +370,26 @@ struct sound_seq_source {
 };
 
 struct sound_stream_source {
-  char unk0[0x5c];              // 0x0
+  char unk0[0x5c];              // 0x00
   struct file handle;           // 0x5c
-  char unk1[0xcc];              // 0xa4
+  char *file_offset;            // 0xa4
+  // read buffer
+  char buffer[0x40];            // 0xa8
+  struct sound_fade_info fade_info;       // 0xe8
+  char unk1[0x18];              // 0xf8
+  /**
+   * bit array of booleans
+   */
+  unsigned int flags;           // 0x110
+  unsigned int unk2;            // 0x114
+  unsigned int unk3;            // 0x118
+  unsigned int unk4;            // 0x11c
+  unsigned int unk5;            // 0x120
+  char unk6[0x3c];              // 0x124
+  void *open_file;              // 0x160
+  void *close_file;             // 0x164
+  void *read_file;              // 0x168
+  void *unk1_fn_ptr;            // 0x16c
   // 0x170
 };
 
@@ -441,6 +457,14 @@ extern int sound_library_initialized;
  */
 extern struct thread sound_thread;
 
+/**
+ * Used do decode IMA-ADPCM stream data on the fly.
+ *
+ * This shouldn't be needed as the sound hardware supports IMA-ADPCM playback.
+ * See: https://problemkaputt.de/gbatek.htm#dssoundnotes
+ */
+extern signed char ima_adpcm_index_table[16];
+extern short ima_adpcm_step_tabble[89];
 
 /*====================== PRIVATE DOUBLE LINKED LIST ===========================
  * Double linked list. Used to support various lists of various types for
@@ -1043,7 +1067,8 @@ bool ndk_sound_sdat_load_group(int id, struct sound_sdat_heap *heap);
 /**
  * Queue a SEQ from a sequence archive for playback
  *
- * NOTE: The SEQARC must have been loaded before this function is called.
+ * NOTE: This function only works if the SEQ has first been loaded using any of
+ * the ndk_sound_load_XXX functions.
  *
  * NOTE: If the handle is already referencing another sound source it will be
  * unreferenced i.e. a handler can only reference one sound source at a time.
@@ -1059,7 +1084,8 @@ bool ndk_sound_add_source_seqarc(struct sound_handle *handle, int seqarc_id,
 /**
  * Queue a SEQ for playback
  *
- * NOTE: The SEQ must have been loaded before this function is called.
+ * NOTE: This function only works if the SEQ has first been loaded using any of
+ * the ndk_sound_load_XXX functions.
  *
  * NOTE: If the handle is already referencing another sound source it will be
  * unreferenced i.e. a handler can only reference one sound source at a time.
@@ -1074,7 +1100,7 @@ bool ndk_sound_add_source_seq(struct sound_handle *handle, int seq_id);
  * Initialize players from current SDAT archive player entries.
  *
  * Should called be after ndk_sound_open_sdat_archive to setup all players for
- * subsequent play back.
+ * subsequent playback.
  *
  * @param heap
  * @return true on success, false otherwise.
@@ -1105,9 +1131,10 @@ void ndk_sound_create_sdat_worker_thread(void *unk0, int priority);
  * Initialize all stream players.
  *
  * Should called be after ndk_sound_open_sdat_archive to setup all stream
- * players for subsequent play back.
+ * players for subsequent playback.
  * 
- * NOTE: The game calls this function with a priority value of 10.
+ * NOTE: The game calls this function with a priority value of 10. Which is a
+ * bit odd since no streams are present in the SDAT archive for the game.
  *
  * @param priority priority of the stream worker thread
  * @param heap

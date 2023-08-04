@@ -41,14 +41,15 @@ struct fnt_entry;
  */
 struct file
 {
+  // list of some sort
   int unk_0x00;              // 0x00
   int unk_0x04;              // 0x04
   struct fat_volume *volume; // 0x08
   /**
-   * bit 0 : 0 == done, 1 == ongoing ?
+   * bit 0 : 0 == done, 1 == ongoing
    * bit 1 : ?
    * bit 2 : 0 == async, 1 == blocking
-   * bit 6 : 1 == busy ?
+   * bit 6 : 0 == file handle owned/used by another thread
    */
   unsigned int flags;         // 0x0c
   /**
@@ -62,7 +63,18 @@ struct file
    * 14 == no operation. Set by ndk_file_init_handle and ndk_file_close
    */
   int operation;              // 0x10
-  int unk_0x14;               // 0x14
+  /**
+   * Error state
+   *
+   * NOTE: set by ndk_file_central_dispatch and by a common subfunction to file
+   * open, read and close functions. This member variable can be used to check
+   * if a read operation succeded or not in the async case.
+   *
+   * 0 == OK / SUCCESS
+   * 2 == ?
+   * 6 == ?
+   */
+  int error;                  // 0x14
   struct thread_list waiting; // 0x18
   int FAT_id;                 // 0x20
   int start_offset;           // 0x24
@@ -143,7 +155,7 @@ extern struct fat_volume
 /**
  * An array of file IO functions. Used by ndk_file_central_dispatch. What is
  * important here is the fact that some of them use the fn_X function in the
- * fat_volume structure. ndk_file_central_dispatch seen to be of great
+ * fat_volume structure. ndk_file_central_dispatch seem to be of great
  * importance as it's called from all over.
  */
 extern int (*file_fn_array[9])(struct file *);
@@ -154,7 +166,7 @@ extern int (*file_fn_array[9])(struct file *);
  * NOTE: There might be no need to call this function directly. It's defined
  * here only for reference.
  *
- * @return status
+ * @return status see file.error
  */
 int ndk_file_central_dispatch(struct file *h, int operation);
 
@@ -216,7 +228,7 @@ bool ndk_file_seek(struct file *h, int offset, int whence);
  *
  * NOTE: This function is blocking and will only return when all bytes have
  * been read (or on failure). But it is interruptable so threads that wait for
- * events like IRQs of timeouts etc. can execute provided they have a priority
+ * events like IRQs or timeouts etc. can execute provided they have a priority
  * that is higher than 4.
  *
  * NOTE: To read the entire file without knowing the file size set count to
@@ -234,7 +246,34 @@ int ndk_file_read(struct file *h, void *dest, int count);
 /**
  * Internal implementation of file read.
  *
- * NOTE: Currently unknown if async can be used for something useful.
+ * NOTE: There are instances where this function will block even though the
+ * async option is set to true. If the file object is currently used by another
+ * thread, it will block until the file object becomes available again. Or if
+ * the file object is owned by us but there is an ongoing file operation. This
+ * case can happen if we try to start a read before a previous read has
+ * finished.
+ *
+ * NOTE: Example of checking if a file operation has finished in async mode:
+ *
+ *       struct file *h;
+ *       // initialize file object, open file, ...
+ *       // store old state
+ *       int old_offset = h.current_offset;
+ *
+ *       int count = 68;
+ *       // perform read
+ *
+ *       // check
+ *       if (h.error == SUCCESS) {
+ *          // check that we got all requested bytes
+ *          if ((h.current_offset - old_offset) == count) {
+ *              // all ok
+ *          } else {
+ *              // error
+ *          }
+ *       } else {
+ *          // we need to wait some more, or error?
+ *       }
  *
  * @param h the file handle
  * @param dest the memory location the read data is to be stored
