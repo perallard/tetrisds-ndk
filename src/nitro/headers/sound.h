@@ -176,8 +176,14 @@ struct sound_info_player {
    */
   unsigned short channels;
   /*
-   * max amount of memory used by the player to load sound data. If set to zero
-   * it will be dynamic.
+   * Max amount of memory the player is allowed to use to load sound data. If
+   * set to zero all sound data has to be preloaded manually before starting
+   * playback of any sound sequences that use this player. Use any of the
+   * ndk_sound_load_XXX_from_sdat_archive functions to preload sound data. If
+   * not zero sound data will be loaded dynamically when calling any of the
+   * ndk_sound_add_source_xxx functions. Note however in this case there might
+   * added delays before the sound is played back due to having to get the sound
+   * data from the ROM first.
    */
   unsigned int heap_size;
 };
@@ -1012,9 +1018,12 @@ void *ndk_sound_load_file_from_sdat_archive(int fat_id,
  * all resource defined in a group. But they can also be called to load
  * induvidual resources from the SDAT archive directly.
  *
+ * NOTE: If heap == NULL and unk0 == 0 then the functions can be used to check
+ * if all sound (including dependent) data has been loaded already.
+ *
  * @param id
  * @param flags see sound_info_group.Group[n].type entry
- * @param heap
+ * @param heap heap to use when loading sound data
  * @param unk0 always 1 in when called in ROM
  * @param out_loc if non-null the loaded entrys address will be written to
  * this location. Always NULL when called in ROM
