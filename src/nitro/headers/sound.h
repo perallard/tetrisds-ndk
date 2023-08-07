@@ -90,7 +90,7 @@
 
 /*
  * These flags are OR'd to enable or disable automatic loading of dependent
- * files.
+ * files in group entries.
  *
  * For example sequence files are usually loaded with 7 this will load the seq
  * file and also bank and wavearc files as well.
@@ -886,7 +886,7 @@ void ndk_sound_sdat_heap_free(struct sound_sdat_heap *heap, int heap_id);
  * later be freed using a single ndk_sound_sdat_heap_free.
  *
  * NOTE: A heap id of zero (0) is reseved for data allocated by the open sdat
- * archive function.
+ * archive function and data allocated by players.
  *
  * @param heap
  * @return newly created heap_id or -1 if operation failed.
@@ -1012,46 +1012,47 @@ void *ndk_sound_load_file_from_sdat_archive(int fat_id,
                                             struct sound_sdat_heap *heap);
 
 /**
- * Load a resource from the SDAT archive.
+ * Load sound resources from the SDAT archive.
  *
- * These functions are used by ndk_sound_load_group_from_sdat_archive to load
- * all resource defined in a group. But they can also be called to load
- * induvidual resources from the SDAT archive directly.
+ * NOTE: Due to the wierd API of these functions I suspect that they are all
+ * internal helper functions to ndk_sound_load_group_from_sdat_archive and
+ * ndk_sound_add_source_XXX functions.
  *
- * NOTE: If heap == NULL and unk0 == 0 then the functions can be used to check
- * if all sound (including dependent) data has been loaded already.
+ * NOTE: ndk_sound_load_group_from_sdat_archive calls these functions with
+ * mode == true and out_loc == NULL. ndk_sound_add_source_XXX calls these
+ * functions with mode == false and out_loc != NULL.
  *
- * @param id
+ * @param id resource id
  * @param flags see sound_info_group.Group[n].type entry
  * @param heap heap to use when loading sound data
- * @param unk0 always 1 in when called in ROM
+ * @param mode if the heap is managed by sdat heap or a player sub-heap
  * @param out_loc if non-null the loaded entrys address will be written to
- * this location. Always NULL when called in ROM
+ * this location.
  * @return SOUND_SUCCESS on success, failure code otherwise.
  */
 int ndk_sound_load_wavearc_from_sdat_archive(int id, unsigned char flags,
                                              struct sound_sdat_heap *heap,
-                                             int unk0, void *out_loc);
+                                             bool mode, void *out_loc);
 
 int ndk_sound_load_bank_from_sdat_archive(int id, unsigned char flags,
                                           struct sound_sdat_heap *heap,
-                                          int unk0, void *out_loc);
+                                          bool mode, void *out_loc);
 
 int ndk_sound_load_seqarc_from_sdat_archive(int id, unsigned char flags,
                                             struct sound_sdat_heap *heap,
-                                            int unk0, void *out_loc);
+                                            bool mode, void *out_loc);
 
 int ndk_sound_load_seq_from_sdat_archive(int id, unsigned char flags,
                                          struct sound_sdat_heap *heap,
-                                         int unk0, void *out_loc);
+                                         bool mode, void *out_loc);
 
 /**
  * Load a Group entry from a SDAT archive
  *
- * All sub-dependencies to resource are automatically loaded So there is no
- * need to track these for your self. See SOUND_INFO_GROUP_FLAG_XXX
- * definitions. How sub-dependencies are handled are defined when creating
- * the SDAT archives.
+ * Used to preload sound data for later playback. All sub-dependencies to
+ * resources are automatically loaded So there is no need to track these for
+ * your self. See SOUND_INFO_GROUP_FLAG_XXX definitions for how sub-dependencies
+ * are defined when creating the SDAT archives.
  *
  * @param id
  * @param heap
@@ -1076,8 +1077,9 @@ bool ndk_sound_sdat_load_group(int id, struct sound_sdat_heap *heap);
 /**
  * Queue a SEQ from a sequence archive for playback
  *
- * NOTE: This function only works if the SEQ has first been loaded using any of
- * the ndk_sound_load_XXX functions.
+ * If a player has its own heap, sound resources will be loaded dynamically.
+ * If not all resource must be loaded using any of the ndk_sound_load_XXX
+ * functions before a call to this function.
  *
  * NOTE: If the handle is already referencing another sound source it will be
  * unreferenced i.e. a handler can only reference one sound source at a time.
@@ -1093,8 +1095,9 @@ bool ndk_sound_add_source_seqarc(struct sound_handle *handle, int seqarc_id,
 /**
  * Queue a SEQ for playback
  *
- * NOTE: This function only works if the SEQ has first been loaded using any of
- * the ndk_sound_load_XXX functions.
+ * If a player has its own heap, sound resources will be loaded dynamically.
+ * If not all resource must be loaded using any of the ndk_sound_load_XXX
+ * functions before a call to this function.
  *
  * NOTE: If the handle is already referencing another sound source it will be
  * unreferenced i.e. a handler can only reference one sound source at a time.
