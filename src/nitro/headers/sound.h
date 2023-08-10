@@ -276,9 +276,26 @@ struct sound_sdat_heap_node {
   // memory block starts here
 };
 
-// size unknown
+/**
+ * NOTE: The heap is implemented as a stack of linear allocators. It maintains a
+ * LIFO structure where one can create and destroy (linear) allocators.
+ * Allocations always takes place on the top of the LIFO structure. Free will
+ * pop/destroy all allocators and thus free their memory to the requested LIFO
+ * level.
+ *
+ * NOTE: LIFO level zero (0) is reserved for players and data allocated by
+ * the open sdat archive function.
+ *
+ * NOTE: size unknown
+ */
 struct sound_sdat_heap {
-  char unk0;
+  void *unk0;                 // 0x00
+  /**
+   * This list implemets the LIFO structire that holds the linear allocators.
+   *
+   * sound_list.count is used by by ndk_sound_sdat_heap_new
+   */
+  struct sound_list allocator_stack;  // 0x04
 };
 
 // in memory sdat archive structure
@@ -867,31 +884,30 @@ int ndk_sound_read_data_from_sdat_archive(int fat_id, void *dest,
  * @param size
  * @return pointer to the heap structure or null if operation failed
  */
-struct sound_sdat_heap *ndk_sound_init_sdat_data_heap(void *data_buffer,
-                                                      int size);
+struct sound_sdat_heap *ndk_sound_sdat_heap_init(void *data_buffer, int size);
 
 /**
- * Free allocated memory by group id.
+ * Free used memory.
+ *
+ * Frees memory by destroying all allocators from the top of the LIFO structure
+ * to and including a requested level.
  *
  * @param heap
- * @param heap_id
+ * @param level A level in the LIFO structure.
  */
-void ndk_sound_sdat_heap_free(struct sound_sdat_heap *heap, int heap_id);
+void ndk_sound_sdat_heap_free(struct sound_sdat_heap *heap, int level);
 
 /**
- * Create an heap id to group allocations with.
+ * Create a new allocator.
  *
- * All subsequent allocations will use this id until another call to this
+ * All subsequent allocations will use this allocator until another call to this
  * function is made. Use this function to group allocations. Which can then
- * later be freed using a single ndk_sound_sdat_heap_free.
- *
- * NOTE: A heap id of zero (0) is reseved for data allocated by the open sdat
- * archive function and data allocated by players.
+ * later be freed using a single call to ndk_sound_sdat_heap_free.
  *
  * @param heap
- * @return newly created heap_id or -1 if operation failed.
+ * @return level of the new allocator in the LIFO allocator.
  */
-int ndk_sound_sdat_create_heap_id(struct sound_sdat_heap *heap);
+int ndk_sound_sdat_heap_new(struct sound_sdat_heap *heap);
 
 /**
  * Allocate memory for SDAT data.
@@ -903,12 +919,12 @@ int ndk_sound_sdat_create_heap_id(struct sound_sdat_heap *heap);
  * @param size
  * @param free_notify
  * @param arch
- * @param heap_id
+ * @param id
  * @return pointer to allocated memory or null i operation failed
  */
 void *ndk_sound_sdat_heap_alloc(struct sound_sdat_heap *heap, int size,
                                 sdat_heap_free_fn free_notify,
-                                struct sound_sdat_arch *arch, int heap_id);
+                                struct sound_sdat_arch *arch, int id);
 
 // TODO: rename to ndk_sound_fat_set_ram_location
 /**
@@ -1001,14 +1017,14 @@ struct sound_sdat_arch *ndk_sound_set_current_sdat_archive(
  * @param fat_id
  * @param free_notify
  * @param arch
- * @param heap_id usually set to fat_id
+ * @param id usually set to fat_id
  * @param heap
  * @return address of the loaded file or NULL if the operation failed.
  */
 void *ndk_sound_load_file_from_sdat_archive(int fat_id,
                                             sdat_heap_free_fn free_notify,
                                             struct sound_sdat_arch *arch,
-                                            int heap_id,
+                                            int id,
                                             struct sound_sdat_heap *heap);
 
 /**
@@ -1077,9 +1093,9 @@ bool ndk_sound_sdat_load_group(int id, struct sound_sdat_heap *heap);
 /**
  * Queue a SEQ from a sequence archive for playback
  *
- * If a player has its own heap, sound resources will be loaded dynamically.
- * If not all resource must be loaded using any of the ndk_sound_load_XXX
- * functions before a call to this function.
+ * If the assigned player has its own heap, sound resources will be loaded
+ * dynamically. If not all resource must be loaded using any of
+ * the ndk_sound_load_XXX functions before a call to this function.
  *
  * NOTE: If the handle is already referencing another sound source it will be
  * unreferenced i.e. a handler can only reference one sound source at a time.
@@ -1095,9 +1111,9 @@ bool ndk_sound_add_source_seqarc(struct sound_handle *handle, int seqarc_id,
 /**
  * Queue a SEQ for playback
  *
- * If a player has its own heap, sound resources will be loaded dynamically.
- * If not all resource must be loaded using any of the ndk_sound_load_XXX
- * functions before a call to this function.
+ * If the assigned player has its own heap, sound resources will be loaded
+ * dynamically. If not all resource must be loaded using any of the
+ * ndk_sound_load_XXX functions before a call to this function.
  *
  * NOTE: If the handle is already referencing another sound source it will be
  * unreferenced i.e. a handler can only reference one sound source at a time.
