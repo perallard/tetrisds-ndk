@@ -45,7 +45,7 @@
  * // initialize a heap that the sound lib will use. buffer is a reference to
  * // memory that is large enough to hold all sound data needed by the program
  * // or game at one time.
- * struct sound_heap *snd_heap = ndk_sound_init_sdat_data_heap(buffer, size);
+ * struct sound_heap *snd_heap = ndk_sound_sdat_heap_init(buffer, size);
  *
  * struct sound_arch *arch;
  * ndk_sound_open_sdat_archive(arch, "/my_sound_arch.sdat", snd_heap, false);
@@ -170,20 +170,20 @@ struct sound_info_wavearc {
 struct sound_info_player {
   // max seq that can be played at once by this player.
   unsigned char max_sequences;
-  /*
+  /**
    * Bit array of allowed hardware channels to use. If set to zero channel
    * allocation will be dynamic.
    */
   unsigned short channels;
-  /*
+  /**
    * Max amount of memory the player is allowed to use to load sound data. If
    * set to zero all sound data has to be preloaded manually before starting
-   * playback of any sound sequences that use this player. Use any of the
-   * ndk_sound_load_XXX_from_sdat_archive functions to preload sound data. If
-   * not zero sound data will be loaded dynamically when calling any of the
+   * playback of any sound sequences that use this player. Use
+   * ndk_sound_load_group for instance to preload sound data. If not zero sound
+   * data will be loaded dynamically when calling any of the
    * ndk_sound_add_source_xxx functions. Note however in this case there might
-   * added delays before the sound is played back due to having to get the sound
-   * data from the ROM first.
+   * some delay before the sound is played due to having to get the sound data
+   * from the ROM first.
    */
   unsigned int heap_size;
 };
@@ -277,11 +277,12 @@ struct sound_sdat_heap_node {
 };
 
 /**
- * NOTE: The heap is implemented as a stack of linear allocators. It maintains a
- * LIFO structure where one can create and destroy (linear) allocators.
- * Allocations always takes place on the top of the LIFO structure. Free will
- * pop/destroy all allocators and thus free their memory to the requested LIFO
- * level.
+ * NOTE: The heap is a LIFO structure that at every entry holds groups of
+ * allocated blocks. The top entry in the LIFO structure is considered to be the
+ * current heap. All blocks created with a call to ndk_sound_sdat_heap_alloc
+ * will be added to the group of the current heap. ndk_sound_sdat_heap_free will
+ * pop/destroy all groups of allocated blocks to the requested LIFO level. To
+ * create/push a new group use ndk_sound_sdat_heap_new_group
  *
  * NOTE: LIFO level zero (0) is reserved for players and data allocated by
  * the open sdat archive function.
@@ -291,9 +292,10 @@ struct sound_sdat_heap_node {
 struct sound_sdat_heap {
   void *unk0;                 // 0x00
   /**
-   * This list implemets the LIFO structire that holds the linear allocators.
+   * This list implemets the LIFO structure that holds groups of allocated
+   * blocks.
    *
-   * sound_list.count is used by by ndk_sound_sdat_heap_new
+   * sound_list.count is used by by ndk_sound_sdat_heap_new_group
    */
   struct sound_list allocator_stack;  // 0x04
 };
@@ -889,8 +891,8 @@ struct sound_sdat_heap *ndk_sound_sdat_heap_init(void *data_buffer, int size);
 /**
  * Free used memory.
  *
- * Frees memory by destroying all allocators from the top of the LIFO structure
- * to and including a requested level.
+ * Frees memory by destroying all groups of allocated blocks from the top of the
+ * LIFO structure to and including a requested level.
  *
  * @param heap
  * @param level A level in the LIFO structure.
@@ -898,16 +900,16 @@ struct sound_sdat_heap *ndk_sound_sdat_heap_init(void *data_buffer, int size);
 void ndk_sound_sdat_heap_free(struct sound_sdat_heap *heap, int level);
 
 /**
- * Create a new allocator.
+ * Create a group to group allocated blocks with.
  *
- * All subsequent allocations will use this allocator until another call to this
+ * All subsequent allocations will use this group until another call to this
  * function is made. Use this function to group allocations. Which can then
  * later be freed using a single call to ndk_sound_sdat_heap_free.
  *
  * @param heap
  * @return level of the new allocator in the LIFO allocator.
  */
-int ndk_sound_sdat_heap_new(struct sound_sdat_heap *heap);
+int ndk_sound_sdat_heap_new_group(struct sound_sdat_heap *heap);
 
 /**
  * Allocate memory for SDAT data.

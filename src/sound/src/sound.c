@@ -45,7 +45,7 @@ static struct sound_handle my_sound_handle;
 static struct sound_sdat_heap *snd_heap;
 static struct sound_sdat_arch snd_arch;
 
-static int group_heap_level;
+static int audio_content_group;
 
 static const char *instructions =
 "Play songs from the Tetris DS\n"
@@ -168,7 +168,7 @@ void init_sound()
   ndk_sound_sdat_init_seq_players(snd_heap);
 
   // used when the group should be freed from the sound heap.
-  group_heap_level = ndk_sound_sdat_heap_new(snd_heap);
+  audio_content_group = ndk_sound_sdat_heap_new_group(snd_heap);
 
   ndk_sound_sdat_load_group(0, snd_heap);
 
