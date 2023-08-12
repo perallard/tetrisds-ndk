@@ -28,7 +28,9 @@
  *    is playing and another sound source is added that uses the same player
  *    it will replace the old one.
  *
- * 7) All sequence and stream playback is done by the ARM7.
+ * 7) All sequence and stream playback is done by the ARM7. Note for streams
+ *    it looks like there is some decoding from IMA-ADPCM to PCM16 that is done
+ *    on the ARM9 side for some reason.
  * 
  * See: http://www.feshrine.net/hacking/doc/nds-sdat.php
  * See: https://gota7.github.io/NitroStudio2/specs/soundData.html
@@ -137,7 +139,7 @@ struct sound_info_bank {
 
 struct sound_info_wavearc {
   unsigned int fat_id : 24;
-  /*
+  /**
    * Bit 0: Cache archive header data only
    *  1 : Load only archive header data. All SWAV files that you intend to use
    *      for playback needs to be manually loaded into RAM. Note that there
@@ -880,7 +882,7 @@ int ndk_sound_read_data_from_sdat_archive(int fat_id, void *dest,
  * Initialize a memory heap for sdat archive sound data.
  *
  * The SDAT library has an internal heap to manage all data that is needed for
- * sound playback. A region of memory must be supplied
+ * sound playback. A region of memory must be supplied.
  *
  * @param data_buffer
  * @param size
@@ -907,7 +909,7 @@ void ndk_sound_sdat_heap_free(struct sound_sdat_heap *heap, int level);
  * later be freed using a single call to ndk_sound_sdat_heap_free.
  *
  * @param heap
- * @return level of the new allocator in the LIFO allocator.
+ * @return level of the newly create group.
  */
 int ndk_sound_sdat_heap_new_group(struct sound_sdat_heap *heap);
 
