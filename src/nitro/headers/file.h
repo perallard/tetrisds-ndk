@@ -154,7 +154,7 @@ extern struct fat_volume
 
 /**
  * An array of file IO functions. Used by ndk_file_central_dispatch. What is
- * important here is the fact that some of them use the fn_X function in the
+ * important here is the fact that some of them use the fn_X functions in the
  * fat_volume structure. ndk_file_central_dispatch seem to be of great
  * importance as it's called from all over.
  */
@@ -166,6 +166,8 @@ extern int (*file_fn_array[9])(struct file *);
  * NOTE: There might be no need to call this function directly. It's defined
  * here only for reference.
  *
+ * @param h
+ * @param operation
  * @return status see file.error
  */
 int ndk_file_central_dispatch(struct file *h, int operation);

@@ -7,12 +7,15 @@
  * tasks an opportunity to (continue to) execute. Only interrupts and timeouts
  * can preempt a current thread/task.
  *
- * NOTE: To have a thread suspend until a specific IRQ event see
- * ndk_thread_wait_irq in interrupts.h
- *
  * When a new thread is created it's added to an internal list or queue. The
  * list or queue is kept sorted in priority order. A priority of zero (0) has
  * the highest priority and the lowest priority is 31.
+ *
+ * NOTE: To have a thread suspend until a specific IRQ event see
+ * ndk_thread_wait_irq in interrupts.h
+ *
+ * NOTE: It is possible for threads to yield within a critical sections without
+ * blocking interrupts from happening in other thread contexts.
  *
  * NOTE: At every context switch the scheduler searches the priority list/queue
  * from the begining for the first scheduled thread to run. This implementation
@@ -29,6 +32,8 @@
 #include "cpu.h"
 
 /**
+ * Critical section functions
+ *
  * These functions are not found in the ROM but compile to very similar code.
  * They are added here because they don't require an compiled object file to
  * be used.
@@ -45,9 +50,10 @@ inline void ndk_thread_critical_leave(int *lock)
 
 /**
  * CPU register and math coprocessor state
+ *
+ * NOTE: This struct is poorly understod. Only its size is known.
  */
 struct context {
-  // NOTE: This struct is poorly understod. Only its size is known.
   int program_status_register;      // 0x00
   // {r0, r1, r2, r3, r4, r5, r6, r7, r8, sb, sl, fp, ip, sp, lr}
   int registers[15];                // 0x04

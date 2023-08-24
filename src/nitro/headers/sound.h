@@ -487,6 +487,9 @@ extern struct thread sound_thread;
 /**
  * Used do decode IMA-ADPCM stream data on the fly.
  *
+ * Used by a function in ROM at 0x02025348 that is called from
+ * ndk_sound_worker_thread_fn.
+ *
  * This shouldn't be needed as the sound hardware supports IMA-ADPCM playback.
  * See: https://problemkaputt.de/gbatek.htm#dssoundnotes
  */

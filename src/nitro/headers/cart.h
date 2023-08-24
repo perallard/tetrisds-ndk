@@ -158,18 +158,18 @@ void ndk_cart_init(void);
  * NOTE: This function is set as the cart read hook in fat_volume by the
  * ndk_fat_mount function.
  *
- * NOTE: This function will try use DMA to transfer all data to its destination
- * but it will fall back to CPU if a number of alignment requirements are not
- * met. See ndk_cart_dma_read_data for more details. Even when falling back to
- * CPU there will be alignment requirements see ndk_cart_cpu_read_data. Long
- * story short in the worst case data might be read by CPU using a double
- * buffer scheme.
+ * NOTE: If dma transfer is requested. This function will try use DMA to
+ * transfer all data to its destination but it will fall back to CPU if a number
+ * of alignment requirements are not met. See ndk_cart_dma_read_data for more
+ * details. Even when falling back to CPU there will be alignment requirements
+ * see ndk_cart_cpu_read_data. Long story short in the worst case data might be
+ * read by CPU using a double buffer scheme.
  *
  * @param dma_channel 0-3 to use DMA or -1 to use CPU
  * @param src address in cart ROM
  * @param dst destination address in RAM
  * @param count number of bytes to read
- * @param cb function to called when the read is complete
+ * @param cb function called when the read is complete
  * @param cb_arg argument passed to cb
  * @param async if true perform a non-blocking read
  */
