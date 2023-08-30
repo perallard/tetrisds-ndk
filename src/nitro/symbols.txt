@@ -200,6 +200,7 @@ ndk_overlay_init_in_ram=0x0200c4f4,function,global
 ndk_overlay_fini_in_ram=0x0200c3e0,function,global
 ndk_overlay_read_into_ram=0x0200c688,function,global
 ndk_overlay_open=0x0200c71c,function,global
+ndk_overlay_init_fat_handle=0x0200c91c,function,global
 ndk_overlay_get_file_size=0x200c984,function,global
 
 ndk_hw_math_restore_context=0x200c9a0,function,global

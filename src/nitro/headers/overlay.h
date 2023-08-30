@@ -8,6 +8,8 @@
 
 #include <stdbool.h>
 
+#include "file.h"
+
 /**
  * Overlay file info. The overlay file table (OVT) is an array of these
  * structures.
@@ -116,6 +118,14 @@ void ndk_overlay_fini_in_ram(struct overlay *h);
  * @return false on failure, true on success
  */
 bool ndk_overlay_read_into_ram(struct overlay *h);
+
+/**
+ * Initialize a fat_handle from overlay data.
+ *
+ * @param h pointer to a fat_handle
+ * @param o pointer to a overlay
+ */
+void ndk_overlay_init_fat_handle(struct fat_handle *h, struct overlay *o);
 
 /**
  * Returns the size of the overlay file in ROM.
