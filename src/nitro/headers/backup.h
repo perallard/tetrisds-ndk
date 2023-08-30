@@ -124,7 +124,7 @@ void ndk_backup_init(unsigned short spec);
  *  BACKUP src addr, RAM dest addr, count, NULL, 0, false, 6, 1, 0
  * )
  *
- * NOTE: src and dest parameters are defined as 'unsigned int' because that
+ * NOTE: src and dest parameters are defined as 'unsigned int' because the
  * (unsigned) integer type is wide enough to also hold a pointer.
  *
  * NOTE: This function will block until any ongoing backup operations have
@@ -166,7 +166,6 @@ unsigned int ndk_backup_get_status(void);
  * reference so we don't end up reversing the same function over and over
  * again.
  */
-
 
 /**
  * @brief Set backup memory type.

@@ -44,7 +44,7 @@ struct cart_read_buf {
   // more?
 };
 
-/*
+/**
  * A reference to this object is sent to the ARM7 via IPC when a backup
  * command is performed.
  */
@@ -150,20 +150,21 @@ void ndk_cart_init(void);
 /**
  * Low level cart data read.
  *
- * NOTE: This function uses cart_state for its internal operation
+ * If dma transfer is requested. This function will try use DMA to transfer all
+ * data to its destination but it will fall back to CPU if a number of alignment
+ * requirements are not met. See ndk_cart_dma_read_data for more details. Even
+ * when falling back to CPU there will be alignment requirements
+ * see ndk_cart_cpu_read_data. Long story short in the worst case data might be
+ * read by CPU using a double buffer scheme.
  *
- * NOTE: For async reads all threads that have a higher priority than 4 will be
- * executed before the read thread is started.
+ * NOTE: This function will block if there is an ongoing cart read.
+ *
+ * NOTE: This function uses cart_state for its internal operation
  *
  * NOTE: This function is set as the cart read hook in fat_volume by the
  * ndk_fat_mount function.
  *
- * NOTE: If dma transfer is requested. This function will try use DMA to
- * transfer all data to its destination but it will fall back to CPU if a number
- * of alignment requirements are not met. See ndk_cart_dma_read_data for more
- * details. Even when falling back to CPU there will be alignment requirements
- * see ndk_cart_cpu_read_data. Long story short in the worst case data might be
- * read by CPU using a double buffer scheme.
+ * NOTE: Async operation only makes sense if DMA is used to transfer data.
  *
  * @param dma_channel 0-3 to use DMA or -1 to use CPU
  * @param src address in cart ROM
@@ -184,6 +185,11 @@ void ndk_cart_read(unsigned dma_channel, unsigned int src, void *dst,
  * ndk_cart_thread_set_handler_and_start. If it has been set executes it else
  * it yields, in an endless loop. Once it has yelded it is only awoken again
  * by a call to ndk_cart_thread_set_handler_and_start.
+ *
+ * It's used when priority elevation is needed by some internal task. To prevent
+ * threads from preemting the cart IO operation. One such case is when async DMA
+ * transfer has been requested but it must fallback to CPU transfer (due to
+ * umnet alignment requirements).
  */
 void ndk_cart_thread_fcn(void);
 
@@ -255,11 +261,8 @@ void ndk_cart_cpu_read_data(struct cart_read_buf *tmp);
  *   cart_state.count == number of bytes to read
  *   cart_state.dma_channel == DMA channel to use
  *
- * NOTE: If dma_channel is a value higher than 3 then no DMA read will be
- * started.
- *
  * NOTE: If dst is not aligned with 4 or src is not aligned with 512 or count
- * is not a multiple of 512 or zero no DMA read will be started.
+ * is not a multiple of 512 or is 0 no DMA read will be started.
  *
  * NOTE: Used by ndk_cart_read.
  *

@@ -1,7 +1,43 @@
 /**
  * FAT and file functions.
  *
- * NOTE: To see how file loading is performed at a lower level see cart.h
+ * Some notes about the file API
+ *
+ * 1. The API can block the current thread for a number of reasons. Usually it
+ * boils to two cases: file objects can only have one active operation on it at
+ * one time. Second the cart layer only supports one read/write operation at one
+ * time.
+ *
+ * 2. Using blocking CPU transfer is always interrupable. Higher priority
+ * threads can preempt the read thread. Mount the FS with dma number -1 and
+ * only use the blocking file read function to read data. This could be useful
+ * in implementing file accesses that should be done in a background thread. But
+ * you also always have the option to split accesses into many smaller parts to
+ * get concurrency. I guess the only reason for CPU only cart IO is that you
+ * need to allocate DMA channel for more important work.
+ *
+ * 3. Using DMA for file transfers are *not* quarantied to use DMA unless a
+ * bunch of alignment constraints are met. See cart.h
+ *
+ * 4. Asynchronicity is only really possible using DMA transfers and the CPU
+ * doing work from cache and TCM memory only, since DMA work blocks the CPU from
+ * the memory bus. But thread switching will most likely block if main memory
+ * can't be accessed, so getting that to work is probably tricky. And probably
+ * of limited use.
+ *
+ * 5. The async option only make sense in conjunction with DMA transfers.
+ *
+ * Conclusion: Async file operation is almost useless as a feature IMHO.
+ * Blocking DMA transfers might be useful, from a performance perspective, but
+ * require some work and planning to get max performance. Since Flash carts have
+ * custom (cart) IO implementations it will be basically imposible to tell in
+ * the general case if DMA and async operation is even used at all. Add to this
+ * the fact that SD cards also differ wildly in IO performance. Designing your
+ * program to be very conservative regarding IO performance is probably a good
+ * idea.
+ *
+ * NOTE: To see how file loading is performed by the SDK at a lower level see
+ * cart.h
  *
  * See: https://problemkaputt.de/gbatek.htm##dscartridgenitroromandnitroarcfilesystems
  */
@@ -161,18 +197,6 @@ extern struct fat_volume
 extern int (*file_fn_array[9])(struct file *);
 
 /**
- * Used to perform different types of IO operations.
- *
- * NOTE: There might be no need to call this function directly. It's defined
- * here only for reference.
- *
- * @param h
- * @param operation
- * @return status see file.error
- */
-int ndk_file_central_dispatch(struct file *h, int operation);
-
-/**
  * Init file system.
  *
  * Must be called before any other file operations are performed. Sets FS as
@@ -228,13 +252,11 @@ bool ndk_file_seek(struct file *h, int offset, int whence);
 /**
  * Read data from file.
  *
- * NOTE: This function is blocking and will only return when all bytes have
- * been read (or on failure). But it is interruptable so threads that wait for
- * events like IRQs or timeouts etc. can execute provided they have a priority
- * that is higher than 4.
+ * NOTE: This function is blocks until all bytes have been read (or on failure).
+ * For more instances where this function blocks see: ndk_file_read_impl.
  *
  * NOTE: To read the entire file without knowing the file size set count to
- * MAX_INT.
+ * MAX_INT or call ndk_file_size
  *
  * NOTE: Calls ndk_file_read_impl with async = false
  *
@@ -244,47 +266,6 @@ bool ndk_file_seek(struct file *h, int offset, int whence);
  * @return number of bytes read or -1 if the read operation failed.
  */
 int ndk_file_read(struct file *h, void *dest, int count);
-
-/**
- * Internal implementation of file read.
- *
- * NOTE: There are instances where this function will block even though the
- * async option is set to true. If the file object is currently used by another
- * thread, it will block until the file object becomes available again. Or if
- * the file object is owned by us but there is an ongoing file operation. This
- * case can happen if we try to start a read before a previous read has
- * finished.
- *
- * NOTE: Example of checking if a file operation has finished in async mode:
- *
- *       struct file *h;
- *       // initialize file object, open file, ...
- *       // store old state
- *       int old_offset = h.current_offset;
- *
- *       int count = 68;
- *       // perform read
- *
- *       // check
- *       if (h.error == SUCCESS) {
- *          // check that we got all requested bytes
- *          if ((h.current_offset - old_offset) == count) {
- *              // all ok
- *          } else {
- *              // error
- *          }
- *       } else {
- *          // we need to wait some more, or error?
- *       }
- *
- * @param h the file handle
- * @param dest the memory location the read data is to be stored
- * @param count the number of bytes to read
- * @param async Continue to execute or block until all bytes are read.
- * @return number of bytes read or -1 if the read operation failed. In the async
- * case count is always returned.
- */
-int ndk_file_read_impl(struct file *h, void *dest, int count, bool async);
 
 /**
  * Open file.
@@ -355,5 +336,65 @@ inline int ndk_file_size(struct file *h)
 {
   return h->end_offset - h->start_offset;
 }
+
+/*========================= PRIVATE FUNCTIONS =================================
+ * The heuristic for 'private' functions is that they are only called from
+ * other functions in this module/logical unit. They are kept here for
+ * reference so we don't end up reversing the same function over and over agin.
+ */
+
+/**
+ * Used to perform different types of IO operations.
+ *
+ * NOTE: There might be no need to call this function directly. It's defined
+ * here only for reference.
+ *
+ * @param h
+ * @param operation
+ * @return status see file.error
+ */
+int ndk_file_central_dispatch(struct file *h, int operation);
+
+/**
+ * Internal implementation of file read.
+ *
+ * There are instances where this function will block even though the async
+ * option is set to true. If the file object is currently used by another
+ * thread, it will block until the file object becomes available again. Or if
+ * the file object is owned by us but there is an ongoing file operation. This
+ * case can happen if we try to start a read before a previous read has
+ * finished.
+ *
+ * Example of checking if a file operation has finished in async mode:
+ *
+ *       struct file *h;
+ *       // initialize file object, open file, ...
+ *       // store old state
+ *       int old_offset = h.current_offset;
+ *
+ *       int count = 68;
+ *       // perform read
+ *
+ *       // check
+ *       if (h.error == SUCCESS) {
+ *          // check that we got all requested bytes
+ *          if ((h.current_offset - old_offset) == count) {
+ *              // all ok
+ *          } else {
+ *              // error
+ *          }
+ *       } else {
+ *          // we need to wait some more, or error?
+ *       }
+ *
+ * @param h the file handle
+ * @param dest the memory location the read data is to be stored
+ * @param count the number of bytes to read
+ * @param async non-blocking operation or not. Non-blocking operation only makes
+ * sense if the file system was initialized to use DMA.
+ * @return number of bytes read or -1 if the read operation failed. In the async
+ * case count is always returned.
+ */
+int ndk_file_read_impl(struct file *h, void *dest, int count, bool async);
 
 #endif // FILE_INCLUDE_FILE
