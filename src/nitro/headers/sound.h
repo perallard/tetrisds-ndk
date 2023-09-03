@@ -624,7 +624,18 @@ void ndk_sound_player_free_notify(void *mem, int size,
 void ndk_sound_init_players(void);
 
 /**
- * Read a variable from the player that's assigned to the handle.
+ * Write to a variable to the player that's assigned to a handle.
+ *
+ * @param handle
+ * @param var variable index [0-15]
+ * @param value value to put in the variable.
+ * @return true if success, false otherwise.
+ */
+bool ndk_sound_handle_write_var(struct sound_handle *handle, int var,
+                                unsigned short value);
+
+/**
+ * Read a variable from the player that's assigned to a handle.
  *
  * @param handle
  * @param var variable index [0-15]

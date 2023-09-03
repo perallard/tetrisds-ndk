@@ -267,6 +267,7 @@ ndk_sound_process=0x2022454,function,global
 ndk_sound_init=0x02022484,function,global
 ndk_sound_player_free_notify=0x0202261c,function,global
 ndk_sound_init_players=0x02022bfc,function,global
+ndk_sound_handle_write_var=0x02022cb0,function,global
 ndk_sound_handle_read_var=0x02022ce0,function,global
 ndk_sound_handle_get_seq_id=0x02022d24,function,global
 ndk_sound_handle_set_seqarc_id=0x02022d48,function,global
