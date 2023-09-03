@@ -21,9 +21,9 @@
  *
  * 4. Asynchronicity is only really possible using DMA transfers and the CPU
  * doing work from cache and TCM memory only, since DMA work blocks the CPU from
- * the memory bus. But thread switching will most likely block if main memory
- * can't be accessed, so getting that to work is probably tricky. And probably
- * of limited use.
+ * the memory bus. Thread switching and interrupt handlers will most likely
+ * block if main memory can't be accessed, so getting that to work is probably
+ * tricky.
  *
  * 5. The async option only make sense in conjunction with DMA transfers.
  *
