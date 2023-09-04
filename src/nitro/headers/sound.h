@@ -30,8 +30,9 @@
  *
  * 7) All sequence and stream playback is done by the ARM7. Note for streams
  *    it looks like there is some decoding from IMA-ADPCM to PCM16 that is done
- *    on the ARM9 side for some reason.
- * 
+ *    on the ARM9 side for some reason. Making IMA-ADPCM streams somewhat less
+ *    attractive to use.
+ *
  * See: http://www.feshrine.net/hacking/doc/nds-sdat.php
  * See: https://gota7.github.io/NitroStudio2/specs/soundData.html
  * See: http://www.feshrine.net/hacking/doc/nds-sdat.php
@@ -491,7 +492,8 @@ extern struct thread sound_thread;
  * ndk_sound_worker_thread_fn.
  *
  * This shouldn't be needed as the sound hardware supports IMA-ADPCM playback.
- * See: https://problemkaputt.de/gbatek.htm#dssoundnotes
+ * See: https://problemkaputt.de/gbatek.htm#dssoundnotes it notes a potential
+ * hardware bug.
  */
 extern signed char ima_adpcm_index_table[16];
 extern short ima_adpcm_step_tabble[89];
