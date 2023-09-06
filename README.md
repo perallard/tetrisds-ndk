@@ -1,10 +1,8 @@
-# tetrisds-nds
+# tetrisds-ndk
 
-## Goal 
-
-To be able create NDS cart images (.nds files) that can access ROM data just
-like a commercial game would do. To eliminate the need for DLDI patching when
-running on flash carts.
+Reverse out the nitro developer kit from a game, so custom cart images can be created
+that can accesses ROM data just like a commercial game would do. To eliminate the
+need for DLDI patching when running from flash carts.
 
 ## Requirements and setup
 
