@@ -182,11 +182,12 @@ struct sound_info_player {
    * Max amount of memory the player is allowed to use to load sound data. If
    * set to zero all sound data has to be preloaded manually before starting
    * playback of any sound sequences that use this player. Use
-   * ndk_sound_load_group for instance to preload sound data. If not zero sound
-   * data will be loaded dynamically when calling any of the
-   * ndk_sound_add_source_xxx functions. Note however in this case there might
-   * some delay before the sound is played due to having to get the sound data
-   * from the ROM first.
+   * ndk_sound_load_group for instance to preload sound data. Also memory has to
+   * be freed manually, use ndk_sound_sdat_heap_free. If not zero sound data
+   * will be loaded dynamically when calling any of the ndk_sound_add_source_xxx
+   * functions. Memory will be automatically freed when it's not needed any more
+   * by the player. Note however there might some delay before the sound is
+   * played due to having to get the sound data from the ROM first.
    */
   unsigned int heap_size;
 };
