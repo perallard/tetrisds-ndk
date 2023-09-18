@@ -347,19 +347,6 @@ extern volatile unsigned short ext_gamepad;
 
 __attribute__((target("thumb"))) void ndk_svc_wait_by_loop(int delay);
 
-
-/**
- * This memory location holds the address to the
- * static initializer array.
- *
- * NOTE: The linker script currently does not support
- * static initializer functions.
- *
- * NOTE: See: https://stackoverflow.com/questions/15265295/understanding-the-libc-init-array
- * https://stackoverflow.com/questions/32700494/executing-init-and-fini
- */
-extern void (*(*static_initializer_array)[])(void);
-
 // ----------------------------------------------------------------------------
 //  Init functions
 // ----------------------------------------------------------------------------

@@ -4,7 +4,7 @@
  * NOTE: All Touch samples are read as raw ADC values and thus must be
  * transformed into screen coordinates using this API.
  *
- * NOTE: This API used the math accelerator for some if its operations.
+ * NOTE: This API used the math accelerator for some of its operations.
  *
  * NOTE: The touch screen controller is managed by the ARM7.
  *

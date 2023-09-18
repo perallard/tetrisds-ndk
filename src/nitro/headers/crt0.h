@@ -39,6 +39,17 @@ extern void *bss_end;
 void (*CRT0_main_fcn)(void);
 
 /**
+ * This memory location holds the address to the static initializer array.
+ *
+ * NOTE: The linker script currently does not support static initializer
+ * functions.
+ *
+ * NOTE: See: https://stackoverflow.com/questions/15265295/understanding-the-libc-init-array
+ * https://stackoverflow.com/questions/32700494/executing-init-and-fini
+ */
+extern void (*(*static_initializer_array)[])(void);
+
+/**
  * See: https://en.wikipedia.org/wiki/Crt0 for a brief explanation.
  */
 void crt0_entry(void);

@@ -381,7 +381,7 @@ ima_adpcm_step_table=0x0205e9f8,object,global
 # 0x0205f11a - 0x0208d74a
 
 # empty. size is one word
-ini_array=0x0209edf8,object,global
+init_array=0x0209edf8,object,global
 
 gfx_engine_a_is_display_on=0x0209ee00,object,global
 gfx_dma_number=0x0209ee04,object,global

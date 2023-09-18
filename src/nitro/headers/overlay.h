@@ -103,9 +103,12 @@ void ndk_overlay_init_in_ram(struct overlay *h);
 /**
  * Executes the .fini array or dtor chain ???
  *
+ * NOTE: This could be close overlay file.
+ *
  * @param h pointer to a overlay handle struct
+ * @return always returns true
  */
-void ndk_overlay_fini_in_ram(struct overlay *h);
+bool ndk_overlay_fini_in_ram(struct overlay *h);
 
 /**
  * Read overlay data into memory.
