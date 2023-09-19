@@ -435,6 +435,8 @@ cart_state=0x020a7540,object,global
 cart_thread_stack_top=0x20a7b60,object,global
 cart_read_buffer=0x020a7b80,object,global
 
+overlay_something=0x020a82f8,object,global
+
 sound_library_initialized=0x20a8418,object,global
 sound_seq_queue=0x20a844c,object,global
 sound_seq_sources=0x20a8458,object,global

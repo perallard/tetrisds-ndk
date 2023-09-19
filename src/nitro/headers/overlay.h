@@ -44,6 +44,9 @@ struct overlay {
   // 0x2c
 };
 
+// used by ndk_overlay_fini_in_ram
+extern void *overlay_something;
+
 /**
  * Load an overlay file into memory.
  *

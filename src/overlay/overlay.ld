@@ -5,11 +5,6 @@ ovr0 OVERLAY_START : {
     src/ovr0.o(.data)
     src/ovr0.o(.rodata .rodata*)
     . = ALIGN(4);
-    _ovr0_init_array_start = .;
-    src/ovr0.o(.init_array)
-    LONG(0);
-    . = ALIGN(4);
-    _ovr0_init_array_end = .;
     _ovr0_end = .;
     _ovr0_bss_start = .;
     src/ovr0.o(.bss .bss* COMMON)
@@ -23,11 +18,6 @@ ovr1 OVERLAY_START : {
     src/ovr1.o(.data)
     src/ovr1.o(.rodata .rodata*)
     . = ALIGN(4);
-    _ovr1_init_array_start = .;
-    src/ovr1.o(.init_array)
-    LONG(0);
-    . = ALIGN(4);
-    _ovr1_init_array_end = .;
     _ovr1_end = .;
     _ovr1_bss_start = .;
     src/ovr1.o(.bss .bss* COMMON)
@@ -41,11 +31,6 @@ itcm1 ITCM_OVERLAY_START : {
     src/ovr_itcm.o(.data)
     src/ovr_itcm.o(.rodata .rodata*)
     . = ALIGN(4);
-    _itcm1_init_array_start = .;
-    src/ovr_itcm.o(.init_array)
-    LONG(0);
-    . = ALIGN(4);
-    _itcm1_init_array_end = .;
     _itcm1_end = .;
     _itcm1_bss_start = .;
     src/ovr_itcm.o(.bss .bss* COMMON)
@@ -58,8 +43,8 @@ ovr_tbl 0x0 : {
     LONG(_ovr0_start);
     LONG(_ovr0_end - _ovr0_start);
     LONG(_ovr0_bss_end - _ovr0_bss_start);
-    LONG(_ovr0_init_array_start);
-    LONG(_ovr0_init_array_end);
+    LONG(0);
+    LONG(0);
     LONG(0);
     LONG(0);    /* flags */
 
@@ -67,8 +52,8 @@ ovr_tbl 0x0 : {
     LONG(_ovr1_start);
     LONG(_ovr1_end - _ovr1_start);
     LONG(_ovr1_bss_end - _ovr1_bss_start);
-    LONG(_ovr1_init_array_start);
-    LONG(_ovr1_init_array_end);
+    LONG(0);
+    LONG(0);
     LONG(1);
     LONG(0);    /* flags */
 
@@ -76,8 +61,8 @@ ovr_tbl 0x0 : {
     LONG(_itcm1_start);
     LONG(_itcm1_end - _itcm1_start);
     LONG(_itcm1_bss_end - _itcm1_bss_start);
-    LONG(_itcm1_init_array_start);
-    LONG(_itcm1_init_array_end);
+    LONG(0);
+    LONG(0);
     LONG(2);
     LONG(0);    /* flags */
 
