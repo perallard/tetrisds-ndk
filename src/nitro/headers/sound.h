@@ -14,11 +14,11 @@
  * 2) All music and sound effects are in a special format called a Sound
  *    sequence (SEQ), think Midi.
  *
- * 3) Sound sequences (SEQ) are added to a list of audio sources for playback
+ * 3) Sound sequences (SEQ) are added to a list of sound sources for playback
  *    using the 'ndk_sound_add_source_seq' and 'ndk_sound_add_source_seqarc'
  *    functions.
  *
- * 4) Added audio sources will only start playing after 'ndk_sound_process' has
+ * 4) Added sound sources will only start playing after 'ndk_sound_process' has
  *    been called.
  *
  * 5) As soon as a sound sequence has finished it's removed from the list of
@@ -343,9 +343,9 @@ struct sound_handle {
 };
 
 struct sound_player {
-  void *unk0;                  // 0x00
-  void *unk1;                  // 0x04
-  char unk2[28];               // 0x08
+  struct sound_list sound_sources;    // 0x00
+  struct sound_list unk1;            // 0x0c
+  char unk2[0x0c];             // 0x18
   // 0x24
 };
 
@@ -458,6 +458,9 @@ extern char sound_temp_data_buffer[60];
 
 extern struct sound_list sound_seq_queue;
 
+/**
+ * This array holds the list of 'active' sound sources.
+ */
 extern struct sound_seq_source sound_seq_sources[16];
 
 extern struct sound_player sound_seq_players[32];
@@ -617,6 +620,22 @@ void ndk_sound_init(void);
 void ndk_sound_player_free_notify(void *mem, int size,
                                   struct sound_sdat_arch *arch,
                                   int fat_id);
+
+/**
+ * Pause playback of a sound source.
+ *
+ * This is an internal helper function used by various sound pause functions.
+ * It's defined here only for reference.
+ */
+void ndk_sound_seq_source_pause(struct sound_seq_source *source, bool pause);
+
+/**
+ * Stop playback of a sound source.
+ *
+ * This is an internal helper function used by various sound stop functions.
+ * It's defined here only for reference.
+ */
+void ndk_sound_seq_source_stop(struct sound_seq_source *source, int duration);
 
 /**
  * Initialize state for all players.
@@ -791,6 +810,9 @@ void ndk_sound_handle_init(struct sound_handle *handle);
 /**
  * Pause playback for a specific player
  *
+ * Iterates the players list of active sound_seq_sources and calls
+ * ndk_sound_seq_source_pause on every entry.
+ *
  * @param player
  * @param pause pause or play
  */
@@ -799,13 +821,19 @@ void ndk_sound_player_pause(int player, bool pause);
 /**
  * Pause playback for a specific handle
  *
+ * Calls ndk_sound_seq_source_pause on the sound_seq_source assigned to the
+ * handle.
+ *
  * @param handle
  * @param pause pause or play
  */
 void ndk_sound_handle_pause(struct sound_handle *handle, bool pause);
 
 /**
- * Stop playback of all SEQs.
+ * Stop playback of all sound sources.
+ *
+ * Iterates the sound_seq_sources array and calls ndk_sound_seq_source_stop on
+ * all the entries.
  *
  * @param duration fade-out duration.
  */
@@ -813,6 +841,9 @@ void ndk_sound_seq_stop_all(int duration);
 
 /**
  * Stop playback of a SEQ.
+ *
+ * Iterates the sound_seq_sources array and calls ndk_sound_seq_source_stop on
+ * any entry that has a matching seq id assigned to it.
  *
  * @param seq_id
  * @param duration fade-out duration
@@ -822,6 +853,9 @@ void ndk_sound_seq_stop(int seq_id, int duration);
 /**
  * Stop a playback for a specific player.
  *
+ * Iterates the sound_seq_sources array and call ndk_sound_seq_source_stop on
+ * any entry that has a matching player (id) assigned to it.
+ *
  * @param id
  * @param duration fade-out duration
  */
@@ -829,6 +863,9 @@ void ndk_sound_player_stop(int id, int duration);
 
 /**
  * Stop playback for a specific handle.
+ *
+ * Calls ndk_sound_seq_source_stop on the sound_seq_source assigned to the
+ * handle.
  *
  * @param handle
  * @param duration fade-out duration
