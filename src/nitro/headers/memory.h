@@ -1,15 +1,5 @@
 /**
- * Memory copy and fill functions
- *
- * For asynchronous DMA copy and fill functions. If there are any ongoing
- * transfers on the choosen DMA channel this function will block until it's
- * finished before it starts the requested one.
- *
- * NOTE: Master interrupt must enabled for these functions to work. See IME
- * register. DMA interrupts must also be enabled.
- *
- * NOTE: When the function blocks to wait for an ongoing transfer IRQs (CPSR)
- * are disabled. So all threads and IRQ handlers are blocked from executing.
+ * Memory copy and fill functions.
  *
  * NOTE: Parts of this module also resides in ITCM.
  */
@@ -18,6 +8,13 @@
 
 /**
  * Copy memory DMA async.
+ *
+ * NOTE: This function will block if there are any ongoing transfers on the
+ * choosen DMA channel. When blocked IRQs (CPSR) are disabled. So all threads
+ * and IRQ handlers are blocked from executing.
+ *
+ * NOTE: Master interrupt must enabled for this function to work. See IME
+ * register. DMA interrupts must also be enabled.
  *
  * @param channel 0-3 See DMA0-3
  * @param source
@@ -34,6 +31,13 @@ void ndk_memory_dma_32bit_copy_async(int channel, void *source,
 /**
  * Fill memory DMA async.
  *
+ * NOTE: This function will block if there are any ongoing transfers on the
+ * choosen DMA channel. When blocked IRQs (CPSR) are disabled. So all threads
+ * and IRQ handlers are blocked from executing.
+ *
+ * NOTE: Master interrupt must enabled for this function to work. See IME
+ * register. DMA interrupts must also be enabled.
+ *
  * @param channel 0-3 See DMA0-3
  * @param dest
  * @param pattern memory will be filled this 32bit wide pattern.
@@ -47,14 +51,10 @@ void ndk_memory_dma_32bit_fill_async(int channel, void *dest,
                                      void *data, void (*callback)(void *));
 
 /**
- * DMA memory copy and fill functions.
- *
- * All functions are CPU polled. The functions will wait/block for any ongoing
- * transfers to finish before starting the requested one.
- */
-
-/**
  * 16bit DMA memory copy.
+ *
+ * NOTE: This function will wait/block for any ongoing transfers to finish
+ * before starting the requested one.
  *
  * @param channel 0-3 See DMA0-3
  * @param source
@@ -67,6 +67,9 @@ void ndk_memory_dma_16bit_copy(int channel, void *source, void *dest,
 /**
  * 16bit DMA memory fill.
  *
+ * NOTE: This function will wait/block for any ongoing transfers to finish
+ * before starting the requested one.
+ *
  * @param channel 0-3 See DMA0-3
  * @param dest
  * @param pattern memory will be filled this 16bit wide pattern.
@@ -77,6 +80,9 @@ void ndk_memory_dma_16bit_fill(int channel, void *dest,
 
 /**
  * 32bit DMA memory copy.
+ *
+ * NOTE: This function will wait/block for any ongoing transfers to finish
+ * before starting the requested one.
  *
  * @param channel 0-3 See DMA0-3
  * @param source
@@ -89,6 +95,9 @@ void ndk_memory_dma_32bit_copy(int channel, void *source, void *dest,
 /**
  * 32bit DMA memory fill.
  *
+ * NOTE: This function will wait/block for any ongoing transfers to finish
+ * before starting the requested one.
+ *
  * @param channel 0-3 See DMA0-3
  * @param dest
  * @param pattern memory will be filled this 32bit wide pattern.
@@ -98,7 +107,9 @@ void ndk_memory_dma_32bit_fill(int channel, void *dest,
                                unsigned int pattern, int size);
 
 /**
- * CPU memory copy and fill functions.
+ * Memory copy and fill functions.
+ *
+ * NOTE: Uses CPU to perform the copy and fill operations.
  *
  * @param size size of the memory region in bytes
  */
@@ -111,7 +122,7 @@ void ndk_memory_32bit_fill(unsigned int pattern, void *dest, int size);
 void ndk_memory_32bit_copy(void *source, void *dest, int size);
 
 /**
- * Fast CPU memory copy and fill functions.
+ * Fast memory copy and fill functions.
  *
  * These functions use LDM and STM instuctions to reduce none sequential access
  * penalties. They read/write 8 words at at time. Any remaining words are moved
