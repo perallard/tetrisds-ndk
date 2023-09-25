@@ -1,9 +1,6 @@
 /**
  * Touch API.
  *
- * NOTE: All Touch samples are read as raw ADC values and thus must be
- * transformed into screen coordinates using this API.
- *
  * NOTE: This API used the math accelerator for some of its operations.
  *
  * NOTE: The touch screen controller is managed by the ARM7.
@@ -20,14 +17,15 @@
  * // screen space coordinates.
  * ndk_touch_set_coordinate_transform(&xform);
  *
- * // Now get raw touch sample (stored in raw)
+ * // Get raw touch sample
  *
+ * struct touch_pos *raw;
  * struct touch_pos coords;
  *
  * // Will apply the set transform to raw and stored in coords.
  * ndk_touch_transform_into_screen_coords(&coords, &raw);
  *
- * // use data in coords ...
+ * // Use data in coords ...
  */
 
 #ifndef TOUCH_INCLUDE_FILE
@@ -160,15 +158,15 @@ unsigned int ndk_touch_get_last_sample_offset(void);
  * Use this function when you want samples from the touch screen controller
  * at higher frequencies.
  *
+ * NOTE: This function depends on v-blank interrupts. So if you plan to use
+ * your own v-blank handler don't forget to set the correct bit in the
+ * thread_irq_bits location. See: interrupts.h for more details.
+ *
  * @param start at what vertical line count the first sample should be read.
  * @param count number of samples to be read within the same frame.
  * @param buffer a circular buffer. Its size must be larger than count by at
  *        least one.
  * @param size number of elements the buffer can hold.
- * 
- * NOTE: This function depends on v-blank interrupts. So if you plan to use
- * your own v-blank handler don't forget to set the correct bit in the
- * thread_irq_bits location. See: interrupts.h for more details.
  */
 void ndk_touch_start_auto_sampling(short start, short count,
                                    struct touch_pos *buffer, int size);
