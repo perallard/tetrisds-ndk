@@ -73,7 +73,7 @@ extern char fs_fat_volume_cache[0x2dc0];
 void *ndk_load_file(struct file *h, int *size);
 
 /**
- * Load a LZ77 compressed file into main memory.
+ * Load a LZ compressed file into main memory.
  *
  * NOTE: This function allocates memory for the file data from the main heap.
  *
@@ -81,7 +81,7 @@ void *ndk_load_file(struct file *h, int *size);
  * @param[out] size pointer where the file size in memory is written.
  * @return pointer to the file data
  */
-void *ndk_load_LZ77_compressed_file(char *filename, int *size);
+void *ndk_load_lz_compressed_file(char *filename, int *size);
 
 
 // --- Tetris game sound functions and data below ----

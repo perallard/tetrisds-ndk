@@ -164,7 +164,7 @@ void ndk_memory_copy(void *source, void *dest, int size);
  * NOTE: Decompressors for huffman and RLE does not seem to be present in the
  * firmware image.
  */
-#define COMPRESSION_LZ77 1
+#define COMPRESSION_LZ 1
 #define COMPRESSION_HUFFMAN 2
 #define COMPRESSION_RLUNCOMP 3
 
@@ -182,11 +182,14 @@ struct compressed_file_header
 };
 
 /**
- * Decompress to a buffer using LZ77
+ * Decompress to a buffer using LZ.
+ *
+ * The LZ compression algorithm is a version of LZSS. See here:
+ * https://www.nesdev.org/wiki/Tile_compression
  *
  * @param comp pointer to the compressed data
  * @param dest pointer to the output buffer
  */
-void ndk_memory_decompress_LZ77(unsigned char *comp, unsigned char *dest);
+void ndk_memory_decompress_lz(unsigned char *comp, unsigned char *dest);
 
 #endif // MEMORY_INCLUDE_FILE

@@ -459,7 +459,7 @@ extern char sound_temp_data_buffer[60];
 extern struct sound_list sound_seq_queue;
 
 /**
- * This array holds the list of 'active' sound sources.
+ * This array holds the list of 'active' seq sound sources.
  */
 extern struct sound_seq_source sound_seq_sources[16];
 

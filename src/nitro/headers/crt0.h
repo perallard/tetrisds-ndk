@@ -6,12 +6,19 @@
 
 /**
  * For compressed firmware binaries (this includes overlays) this structure
- * is appended to the end of the binary so that it can be decompressed by
- * ndk_decompress_firmware_LZ77.
+ * is appended to the end of the compressed binary data so that it can be
+ * decompressed by the ndk_decompress_firmware_lz function.
  */
-struct fw_lz77_footer {
+struct fw_lz_footer {
+  /**
+   * Offset to where the first uncompressed byte is to be written. It's relative
+   * to the end of this structure.
+   */
   unsigned int top_offset;
   unsigned int compressed_size: 24;
+  /**
+   * Offset to the start of the compressed data
+   */
   unsigned int start_offset: 8;
 };
 
@@ -55,11 +62,11 @@ extern void (*(*static_initializer_array)[])(void);
 void crt0_entry(void);
 
 /**
- * Decompress LZ77 compressed data inplace in memory. Used to decompress the
+ * Decompress LZ compressed data inplace in memory. Used to decompress the
  * ARM9 binary and overlays.
  *
  * @param comp pointer to the end of the compressed buffer.
  */
-void ndk_decompress_firmware_LZ77(unsigned char *comp);
+void ndk_decompress_firmware_lz(unsigned char *comp);
 
 #endif // CRT0_INCLUDE_FILE

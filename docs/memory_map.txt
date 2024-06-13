@@ -72,7 +72,7 @@ ARM9 'Firmware' memory layout (main RAM):
   0x02026500 - ?          Tetris game code
   0x02051000 ~ Wifi ?
   0x02053000 ~ Nifi ?
-  0x02058000 ~ DWC lib ?
+  0x02058000 ~ DWC lib ?  DS, Wii online multiplayer server
              - 0x020a537f end of static firmware image
 
 

@@ -9,7 +9,7 @@ ndk_svc_wait_by_loop=0x02000273,function,global
 
 crt0_entry=0x02000800,function,global
 
-ndk_decompress_firmware_LZ77=0x02000934,function,global
+ndk_decompress_firmware_lz=0x02000934,function,global
 
 # main
 game_main=0x02000c10,function,global
@@ -172,7 +172,7 @@ ndk_memory_fast_32bit_copy=0x02008abc,function,global
 ndk_memory_fill=0x02008af4,function,global
 ndk_memory_copy=0x02008b88,function,global
 
-ndk_memory_decompress_LZ77=0x02008cc0,function,global
+ndk_memory_decompress_lz=0x02008cc0,function,global
 
 ndk_ipc_init=0x0200a088,function,global
 ndk_ipc_irq_handler_recv_fifo_not_empty=0x0200a094,function,global
@@ -344,7 +344,7 @@ game_commit_sounds=0x02027ce8,function,global
 game_sound_load_sfx=0x02028368,function,global
 game_sound_init_and_open_sdat_archive=0x02028384,function,global
 
-game_load_LZ77_compressed_file=0x020497b0,function,global
+game_load_lz_compressed_file=0x020497b0,function,global
 game_load_file=0x0204986c,function,global
 game_read_key_presses=0x02049d9c,function,global
 game_alloc=0x0204b060,function,global

@@ -1,7 +1,7 @@
 /**
  * Touch API.
  *
- * NOTE: This API used the math accelerator for some of its operations.
+ * NOTE: This API uses the math accelerator for some of its operations.
  *
  * NOTE: The touch screen controller is managed by the ARM7.
  *
