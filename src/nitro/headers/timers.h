@@ -39,7 +39,7 @@ unsigned int ndk_timer_read_timer0(void);
  * Initialise times for use by the thread API.
  *
  * If you plan to use the ndk_thread_sleep function in your game logic then
- * this function must be called as part of you startup inititalization.
+ * this function must be called as part of you startup initialization.
  */
 void ndk_thread_init_timers(void);
 

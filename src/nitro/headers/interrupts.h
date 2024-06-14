@@ -18,28 +18,32 @@
 typedef void ndk_irq_handler_fn(void);
 
 /**
- * Used by ndk_irq_handler_impl to get the correct IRQ bit for a set callback.
+ * Used by ndk_irq_callback_handler_impl to get the correct IRQ bit for a set
+ * callback.
  *
  * Don't use this value directly. It's defined here only for reference.
  */
 extern unsigned short irq_callback_bit_pow[8];
 
 /**
- * This structure holds all callbacks set by the ndk_irq_set_timer_callback and
+ * This structure holds callbacks set by the ndk_irq_set_timer_callback and
  * ndk_irq_set_dma_callback functions.
- *
- * NOTE: keep_irq if 0 == clear IRQ enable bit for this callback after it has
- * been called.
  *
  * Don't use these values directly. It's defined here only for reference.
  */
 struct irq_callback
 {
   void (*callback)(void *);
+  /*
+   * if 0 clear the IRQ enable bit for this callback after it has been called.
+   */
   int keep_irq;
   void *data;
 };
 
+/*
+ * Entries 0-3 hold DMA callbacks and entries 4-7 hold timer callbacks.
+ */
 extern struct irq_callback irq_callbacks[8];
 
 /**
@@ -65,9 +69,9 @@ ndk_irq_handler_fn *ndk_irq_get_handler(unsigned int irq_mask);
  * defined by the set bits in the irq_mask, see IE register (4000210h).
  *
  * NOTE: If the sources are DMA0-3 or Timer0-3 then the handler will be
- * converted to a irq_callback entry with id = 1 and keep_irq = 0. Ie. it will
- * be executed only once then removed. Also note that IRQs for the DMA0-3 and
- * Timer0-3 are *not* automatically set.
+ * converted to a irq_callback entry with data = 0 and keep_irq = 1. Also note
+ * that IRQs for the DMA0-3 and Timer0-3 are *not* automatically enabled by this
+ * function.
  *
  * The default DMA and Timer IRQ handlers seem to be critical for the operation
  * of the SDK so it can't be overridden normally.
@@ -161,12 +165,14 @@ void ndk_thread_wait_irq(bool clear, unsigned int irq_mask);
  * Handler for DMA and Timer callbacks Only here for reference. Don't call it
  * directly.
  */
-void ndk_irq_handler_impl(void);
+void ndk_irq_callback_handler_impl(void);
 
 /**
  * Set callback for timer overflow.
  *
- * NOTE: This function will enable IRQ for the timer and set the keep_irq to 1.
+ * This function will enable IRQ for the specified timer. Once the callback has
+ * been invoked it's removed from the list of callbacks. Note however that the
+ * IRQ is *not* disabled again after the invocation.
  *
  * @param timer 0-3
  * @param cb callback function
@@ -177,8 +183,9 @@ void ndk_irq_set_timer_callback(int timer, void (*cb)(void *), void *data);
 /**
  * Set callback for DMA done.
  *
- * NOTE: This function will enable IRQ for the DMA channel and set the keep_irq
- * to 1.
+ * This function will enable IRQ for the specificed DMA channel. Once the
+ * callback has been invoked it's removed from the list of callbacks. Note
+ * that the IRQ will only be disabled if it was disabled prior to this call.
  *
  * @param channel 0-3
  * @param cb callback function

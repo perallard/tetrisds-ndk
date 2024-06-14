@@ -57,7 +57,7 @@ ndk_load_bg_palette_data_to_engine_b=0x0200458c,function,global
 ndk_load_bg_palette_data_to_engine_a=0x020045ec,function,global
 
 ndk_thread_wait_irq=0x02004980,function,global
-ndk_irq_handler_impl=0x02004a78,function,global
+ndk_irq_callback_handler_impl=0x02004a78,function,global
 ndk_set_irq_stack_canaries=0x02004b10,function,global
 ndk_irq_acknowledge_request=0x02004b44,function,global
 ndk_irq_disable_interrupt_sources=0x02004b78,function,global
