@@ -6,6 +6,9 @@
 #ifndef NDS_INCLUDE_FILE
 #define NDS_INCLUDE_FILE
 
+#include <stdarg.h>
+#include <stddef.h>
+
 #define SCREEN_WIDTH 256
 #define SCREEN_HEIGHT 192
 
@@ -427,5 +430,18 @@ void ndk_slot1_give_arm7_access(void);
 void ndk_slot2_give_arm9_access(void);
 
 void ndk_slot2_give_arm7_access(void);
+
+
+// ----------------------------------------------------------------------------
+//  printf functions
+// ----------------------------------------------------------------------------
+
+int ndk_vsnprintf(char *s, size_t size, const char *fmt, va_list arg);
+
+int ndk_snprintf(char *s, size_t n, const char *fmt, ...);
+
+int ndk_vsprintf(char *s, const char *fmt, va_list arg);
+
+int ndk_sprintf(char *s, const char *fmt, ...);
 
 #endif

@@ -74,6 +74,11 @@ ndk_slot1_give_arm9_access=0x02004e9c,function,global
 ndk_slot2_give_arm7_access=0x02004eec,function,global
 ndk_slot2_give_arm9_access=0x02004f04,function,global
 
+ndk_vsnprintf=0x020051b4,function,global
+ndk_snprintf=0x02005a78,function,global
+ndk_vsprintf=0x02005aa8,function,global
+ndk_sprintf=0x02005ac0,function,global
+
 ndk_thread_is_subsystem_initialized=0x02005bd4,function,global
 ndk_thread_set_exit_fn=0x02005be4,function,global
 ndk_thread_idle_cpu_fn=0x2005c54,function,global

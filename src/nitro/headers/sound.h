@@ -6,10 +6,10 @@
  *
  * Some notes on how the API for the Sound Archive (SDAT) works.
  *
- * 1) A 'sound source' is either a sound sequence or a sound stream. The
- *    maximum number of sound sources that can be played simultaneously is 16
- *    for sequences (SEQ) and 4 for streams (STRM). Sound streams can't be
- *    played since code for it seems to be missing from the ROM.
+ * 1) A 'sound source' is either a sound sequence (SEQ) or a sound stream
+ *    (STRM). The maximum number of sound sources that can be played
+ *    simultaneously is 16 for sequences (SEQ) and 4 for streams (STRM). Code
+ *    for stream playback seems to be missing from the ROM.
  *
  * 2) All music and sound effects are in a special format called a Sound
  *    sequence (SEQ), think Midi.
@@ -57,8 +57,6 @@
  * ndk_sound_sdat_init_seq_players(snd_heap);
  *
  * // sound data can now be loaded from the archive.
- *
- * TODO: give an code example on how to play a sound data.
  */
 #ifndef SOUND_INCLUDE_FILE
 #define SOUND_INCLUDE_FILE
@@ -71,7 +69,6 @@
 /*
  * Sound IO error code defines
  */
-
 #define SOUND_SUCCESS 0
 #define SOUND_INVALID_GROUP 1
 #define SOUND_INVALID_SEQ 2

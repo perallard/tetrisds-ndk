@@ -1,50 +1,56 @@
+This file holds information about what is known about the run-time memory layout
+of the Tetris DS game.
+
 At boot:
   ARM9 binary loaded at 0x02000000
   ARM7 binary loaded at 0x02380000
 
-ARM9:
-  ARM9.crt0 starts at 0x02000800
 
-  ARM9.crt0 sets up the memory regions
-  for ARM7 also, init the memory as shown
-  below then jumps to 0x02000c10 (main)
+After crt0 has been executed:
+  ARM9:
+    ARM9.crt0 starts at 0x02000800
 
-ITCM:
-  0x01ff8000 - 0x01ff8620 ARM9 interrupt handling
+    ARM9.crt0 sets up the memory regions
+    for ARM7 also, init the memory as shown
+    below then jumps to 0x02000c10 (main)
 
-ARM9 MAIN RAM:
-  0x02000000 - 0x020007ff secure area [part of the ARM9 binary]
-  0x02000800 - 0x020a537f ARM9 code/data
-  0x020a5380 - 0x0213a15f ARM9 BSS section
-             - 0x02400000 Main RAM end
+  ITCM:
+    0x01ff8000 - 0x01ff8620 ARM9 interrupt handling
 
-DTCM:
-  0x027c0000 - 0x027c0060 ARM9 data
-             - 0x027c3b80 ARM9 User/System stack top
-             - 0x027c3f80 ARM9 IRQ stack top
-             - 0x027c3fc0 ARM9 Supervisor stack top
+  ARM9 MAIN RAM:
+    0x02000000 - 0x020007ff secure area [part of the ARM9 binary]
+    0x02000800 - 0x020a537f ARM9 code/data
+    0x020a5380 - 0x0213a15f ARM9 BSS section
+               - 0x02400000 Main RAM end
 
-ARM7:
-  ARM7.crt0 starts at 0x02380000
+  DTCM:
+    0x027c0000 - 0x027c0060 ARM9 data
+               - 0x027c3b80 ARM9 User/System stack top
+               - 0x027c3f80 ARM9 IRQ stack top
+               - 0x027c3fc0 ARM9 Supervisor stack top
 
-  ARM7.crt0 copies the data to the three regions below
-  then jumps to 0x37f8468 (main)
+  ARM7:
+    ARM7.crt0 starts at 0x02380000
 
-ARM7 MAIN RAM:
-  0x023e0000 - 0x023f828b ARM7 code/data [0x027e0000]
-  0x023f828c - 0x023f9bf4 ARM7 BSS section
-             - 0x02400000 Main RAM end
+    ARM7.crt0 copies the data to the three regions below
+    then jumps to 0x37f8468 (main)
 
-ARM7-WRAM (64K) & shared RAM (32K) all 96k allocated to ARM7
-  0x037f8000 - 0x0380822f ARM7 code/data
-  0x03808230 - 0x0380baa7 ARM7 BSS section
+  ARM7 MAIN RAM:
+    0x023e0000 - 0x023f828b ARM7 code/data [0x027e0000]
+    0x023f828c - 0x023f9bf4 ARM7 BSS section
+               - 0x02400000 Main RAM end
 
-             - 0x0380fb80 ARM7 User/System stack top
-             - 0x0380ff80 ARM7 IRQ stack top
-             - 0x0380ffc0 ARM7 Supervisor stack top
-             - 0x03810000 ARM7-WRAM end
+  ARM7-WRAM (64K) & shared RAM (32K) all 96k allocated to ARM7
+    0x037f8000 - 0x0380822f ARM7 code/data
+    0x03808230 - 0x0380baa7 ARM7 BSS section
 
-ARM9 'Firmware' memory layout (main RAM):
+               - 0x0380fb80 ARM7 User/System stack top
+               - 0x0380ff80 ARM7 IRQ stack top
+               - 0x0380ffc0 ARM7 Supervisor stack top
+               - 0x03810000 ARM7-WRAM end
+
+
+ARM9 static 'Firmware' memory layout (main RAM):
 
   0x02000000 - 0x020007ff secure area, contains BIOS function trampolines
   0x02000800 - 0x02000c0f ARM9 crt0
@@ -53,6 +59,7 @@ ARM9 'Firmware' memory layout (main RAM):
   0x02001434 - 0x0200497f graphics functions
   0x02004980 - 0x02004de7 IRQ management
   0x02004de8 - ?
+  0x020051b4 - 0x02005bd3 sprinf functions
   0x02005bd4 - 0x02006e47 threading
   0x02006e48 - 0x02006f43 CPU cache management
   0x02006f44 - 0x02006f8f platform init
@@ -61,24 +68,25 @@ ARM9 'Firmware' memory layout (main RAM):
   0x020079a4 - 0x02007ff7 timers
   0x02007ff8 - ?
   0x02008dd8 ~ 0x0200a568 IPC for all subsystems
-  0x0200b150 ~ 0x0200c99f IO file and overlays
+  0x0200b150 ~ 0x0200c99f file IO and overlays
   0x0200c9a0 ~ 0x0200ca7f accelerator (HW math) state save/restore
   0x0200ca80 ~ 0x0200d5b3 touch
   0x0200ef60 - 0x0200f52b backup, low level cart IO
   0x0200f52c - 0x0201001b low level cart IO
-  0x0201001c -            Run-time support functions (libc?)
-  0x0201f000 -            Run-time math support functions (libc?)
+  0x0201001c -            Run-time support functions (libc)
+  0x0201f000 -            Run-time math support functions (libgcc)
   0x020217b8 - 0x020264ff Sound lib (Nitro sound?)
   0x02026500 - ?          Tetris game code
   0x02051000 ~ Wifi ?
   0x02053000 ~ Nifi ?
-  0x02058000 ~ DWC lib ?  DS, Wii online multiplayer server
-             - 0x020a537f end of static firmware image
+  0x02058000 ~ 0x0205a0cf DWC lib ?  DS, Wii online multiplayer server
+  0x0205a0d0 - 0x020a537f data section
+  0x020a5380 end of static firmware image
 
 
-ARM9 section locations (at run-time)
-  0x02000800 - 0x0205a0cf text        ~90k ARM instructions
-    0x02026500 - 0x02051000 text Tetris game
+ARM9 section (test, data and BSS) locations (at run-time)
+  0x02000800 - 0x0205a0cf .text        ~90k ARM instructions
+    0x02026500 - 0x02051000 .text Tetris game
 
   0x0205a0d0 - ?            .data, .rodata, ...
     0x0205f11a - 0x0208d74a wchar string data
@@ -113,20 +121,27 @@ _ = Game
 0x02000000           0x0205a0d0       0x020a5380      0x0213a160      0x0222dde0        0x023e0000
 
 
-SDK subsystem dependency map (not complete)
-    backup: thread, cart, ipc
-    bios_ram: none
-    cart: thread, memory, ipc
-    cpu: none
-    file: thread, cart
-    gfx: memory, math
-    heap: none
-    math: none
+SDK subsystem dependency map (not complete).
+    backup:     thread, cart, ipc
+    bios_ram:   none
+    cart:       thread, memory, ipc
+    cpu:        none
+    crt0:       none
+    dtcm:       ?
+    file:       thread, cart
+    fx_math:    none, accelerator
+    gfx:        memory, fx_math
+    heap:       none
     interrupts: thread
-    ipc: interrupts, thread (critical section)
-    memory: cpu, DMA, itcm
-    nds: all?
-    overlay: file
-    sound: file, thread, ipc
-    thread: cpu, interrupts, timers, ITCM
-    touch: math, interrupts, thread, cpu
+    ipc:        interrupts, thread (critical section)
+    itcm:       ?
+    memory:     cpu, *DMA, itcm
+    nds:        ?
+    overlay:    file
+    sound:      file, thread, ipc, libc (div/mod)
+    thread:     cpu, interrupts, timers, ITCM
+    timers:     thread
+    touch:      *accelerator, interrupts, thread, cpu
+
+accelerator: math hardware accelerator
+DMA: dma hardware

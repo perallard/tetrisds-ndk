@@ -1,12 +1,17 @@
 
-Crt0 sections table in the arm9 binary.
+crt0 sections table in the arm9 binary.
+
 0x02000b4c:
    0x020a5a00  <-- section info array start
    0x020a5a18  <-- section info array end
    0x020a5380  <-- section data start
 
 Entries in the array has the folloing format:
-   { u32 address, u32 text_data_size, u32 bss_size }
+   {
+      u32 address,
+      u32 text_data_size,
+      u32 bss_size
+   }
 
 Contents of the array is:
 0x020a5a00:

@@ -11,6 +11,9 @@
 
 #include "term.h"
 
+#define SAMPLE_BUF_SIZ 8
+#define SAMPLE_BUF_MOD (SAMPLE_BUF_SIZ - 1)
+
 /*
  * Thumb is used by default so we need to tell GCC to use ARM here.
  */
@@ -23,7 +26,6 @@ static void init(void);
 static void read_key_presses();
 static void vblank_handler(void);
 
-
 static unsigned short old_gamepad_state;
 static unsigned short gamepad_btn_down;
 
@@ -32,6 +34,9 @@ static const char *info_text =
 "L-btn: auto samling\n"
 "R-btn: manual sampling\n"
 "X: clear screen";
+
+static struct touch_pos tbuf[SAMPLE_BUF_SIZ];
+static bool auto_sample = false;
 
 /*
  * These two definitions below are needed so the linker can patch the CRT0
@@ -65,9 +70,6 @@ int main()
 
   term_prints(info_text);
 
-  struct touch_pos tbuf[5];
-  bool auto_sample = false;
-
   while(1) {
     read_key_presses();
 
@@ -85,7 +87,7 @@ int main()
 
     if (gamepad_btn_down & BTN_L) {
       auto_sample = true;
-      ndk_touch_start_auto_sampling(0, 4, tbuf, 5);
+      ndk_touch_start_auto_sampling(0, 4, tbuf, SAMPLE_BUF_SIZ);
     }
 
     if (auto_sample) {
@@ -97,7 +99,7 @@ int main()
          * offset 'points' to the last (top) element. So to move back to the
          * first element 3 is subtracted since 4 values are read per frame.
          */
-        int idx = (offset - 3 + i) % 5;
+        unsigned idx = (offset - 3 + i) & SAMPLE_BUF_MOD;
 
         ndk_touch_transform_into_screen_coords(&result, &tbuf[idx]);
 

@@ -12,6 +12,8 @@ go with:
 Tetris DS (NTR-ATRP-EUR)  
 MD5 340856a9c56cc6cb6cd0966b38f5624f
 
+Use gnu md5sum to generate the MD5 sum.
+
 Depends on devkitPro for cross compilation and creating NDS images.
 See: https://devkitpro.org/wiki/Getting_Started
 

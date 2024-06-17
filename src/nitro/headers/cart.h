@@ -134,7 +134,6 @@ extern struct cart
 
 /**
  * Sets a handler function that is to be executed in ndk_cart_thread_fcn.
- * It also wakes the cart worker thread.
  *
  * NOTE: Most likely a helper function.
  */
@@ -181,10 +180,10 @@ void ndk_cart_read(unsigned dma_channel, unsigned int src, void *dst,
 /**
  * This is the worker function that run in the cart thread.
  * 
- * It checks if a handler function has be set, see
- * ndk_cart_thread_set_handler_and_start. If it has been set executes it else
- * it yields, in an endless loop. Once it has yelded it is only awoken again
- * by a call to ndk_cart_thread_set_handler_and_start.
+ * It checks if a handler function has been set, see
+ * ndk_cart_thread_set_handler_and_start. If it a handler has been set executes
+ * it else it yields, in an endless loop. Once it has yelded it is only awoken
+ * again by a call to ndk_cart_thread_set_handler_and_start.
  *
  * It's used when priority elevation is needed by some internal task. To prevent
  * threads from preemting the cart IO operation. One such case is when async DMA

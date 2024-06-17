@@ -144,7 +144,7 @@ void ndk_backup_init(unsigned short spec);
  * @param unk9 mode 0:read, 2:write ?
  *
  * @return True if operation was successful, false otherwise. If async mode
- * was requested true is always returned. The get error information after the
+ * was requested true is always returned. To get error information after the
  * command completes call ndk_backup_get_status or read it directly from
  * backup_state. See cart.h.
  */
