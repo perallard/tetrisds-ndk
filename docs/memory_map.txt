@@ -121,27 +121,37 @@ _ = Game
 0x02000000           0x0205a0d0       0x020a5380      0x0213a160      0x0222dde0        0x023e0000
 
 
-SDK subsystem dependency map (not complete).
-    backup:     thread, cart, ipc
-    bios_ram:   none
-    cart:       thread, memory, ipc
-    cpu:        none
-    crt0:       none
-    dtcm:       ?
-    file:       thread, cart
-    fx_math:    none, accelerator
-    gfx:        memory, fx_math
-    heap:       none
-    interrupts: thread
-    ipc:        interrupts, thread (critical section)
-    itcm:       ?
-    memory:     cpu, *DMA, itcm
-    nds:        ?
-    overlay:    file
-    sound:      file, thread, ipc, libc (div/mod)
-    thread:     cpu, interrupts, timers, ITCM
-    timers:     thread
-    touch:      *accelerator, interrupts, thread, cpu
+SDK subsystem dependency map (not complete). The purpose of this map is to give
+a overview of what modules *must* be kept and used. Which ones can be skipped or
+replaced or even overwritten in memory, if we need the space.
 
-accelerator: math hardware accelerator
-DMA: dma hardware
+use         dependencies
+
+*backup:    thread, cart, ipc
+bios_ram:   ?
+cart:       thread, memory, ipc
+cpu:        none
+crt0:       must be used.
+dtcm:       interrupts, thread, CPU stack
+*file:      thread, cart
+fx_math:    none, *accelerator
+gfx:        memory, fx_math
+heap:       none
+interrupts: thread, dtcm, itcm
+ipc:        interrupts, thread (critical section)
+itcm:       interrupts, memory, thread, dtcm
+memory:     cpu, *DMA, itcm
+*nds:       ?
+overlay:    file
+sound:      file, thread, ipc, libc (div/mod)
+thread:     cpu, interrupts, timers, itcm, dtcm
+timers:     thread
+touch:      *accelerator, interrupts, thread, cpu
+
+nds: currently a place hold definitions that don't have a clear module yet.
+accelerator: math hardware accelerator. It's probably safe to use accelerator
+             hardware directly without it interfering with the SDK.
+DMA: dma hardware.
+file: subsystem/module can be initialized to not use DMA for data transfers.
+backup: does not seem to use DMA data transfers.
+?: dependent modules are unknown / not mapped. -> keep
