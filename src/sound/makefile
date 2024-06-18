@@ -12,8 +12,7 @@ XDELTA_FILE=build/$(PATCHED_ROM_NAME).xdelta
 
 MODULES=src $(NDK_DIR) $(UTIL_PATH)
 
-OBJS=src/sound.o $(NDK_DIR)/symbols.o $(UTIL_PATH)/term.o \
-	$(UTIL_PATH)/snprintf.o
+OBJS=src/sound.o $(NDK_DIR)/symbols.o $(UTIL_PATH)/term.o
 
 .PHONY: all debug patch clean $(MODULES)
 

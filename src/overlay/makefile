@@ -18,7 +18,7 @@ XDELTA_FILE=$(BUILD_DIR)/$(PATCHED_ROM_NAME).xdelta
 MODULES=src $(UTIL_PATH) $(NDK_DIR)
 
 OBJS=src/main.o src/common.o src/ovr0.o src/ovr1.o src/ovr_itcm.o \
-	$(UTIL_PATH)/term.o $(UTIL_PATH)/snprintf.o $(NDK_DIR)/symbols.o
+	$(UTIL_PATH)/term.o $(NDK_DIR)/symbols.o
 
 ARM9_PATCHES = $(BUILD_DIR)/arm9.o
 

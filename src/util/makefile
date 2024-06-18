@@ -15,7 +15,7 @@ CXXFLAGS = $(CFLAGS) -fno-rtti -fno-exceptions
 
 LDFLAGS = -r --use-blx
 
-OBJS = term.o snprintf.o
+OBJS = term.o
 
 .PHONY: all setup clean
 

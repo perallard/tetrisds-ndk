@@ -1,8 +1,8 @@
 #include "term.h"
 
+#include "nds.h"
 #include "cpu.h"
 #include "memory.h"
-#include "snprintf.h"
 
 #define TERM_ROWS 24
 #define TERM_COLS 32
@@ -100,7 +100,7 @@ void term_printf(const char *fmt, ...)
 {
   va_list ap;
   va_start (ap, fmt);
-  vsnprinf(term_base.conv_buf, sizeof(term_base.conv_buf), fmt, ap);
+  ndk_vsnprintf(term_base.conv_buf, sizeof(term_base.conv_buf), fmt, ap);
   va_end (ap);
 
   term_prints(term_base.conv_buf);
