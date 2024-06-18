@@ -8,12 +8,7 @@
 #ifndef FIX_MATH_INCLUDE_FILE
 #define FIX_MATH_INCLUDE_FILE
 
-#define fix12_frac(v) ((v) & 4095)
-#define fix12_integer(v) ((v) >> 12)
-#define fix12_scale 4096
 #define fix12_one (1 << 12)
-
-#define int_to_fix12(v) ((v) << 12)
 
 /**
  * This is the main fixed point type. It's 32 bits wide with a 20 bit signed

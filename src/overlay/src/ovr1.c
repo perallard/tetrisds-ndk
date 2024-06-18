@@ -5,7 +5,7 @@
 
 #include "common.h"
 
-static fix_angle angle = 0;
+static fix_angle angle = fix_angle_0;
 
 void _overlay1_entry()
 {
