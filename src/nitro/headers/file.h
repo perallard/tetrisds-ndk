@@ -3,38 +3,23 @@
  *
  * Some notes about the file API
  *
- * 1. The API can block the current thread for a number of reasons. Usually it
- * boils to two cases: file objects can only have one active operation on it at
- * one time. Second the cart layer only supports one read/write operation at one
- * time.
+ * DMA will only be used if:
+ *  1. File system has been initialized to use DMA.
+ *  2. The ROM source address is aligned with 512.
+ *  3. The destination address is aligned with 4.
+ *  4. The destination address is *not* in ITCM of DTCM.
+ *  5. Read size is a multiple of 512.
  *
- * 2. Using blocking CPU transfer is always interrupable. Higher priority
- * threads can preempt the read thread. Mount the FS with dma number -1 and
- * only use the blocking file read function to read data. This could be useful
- * in implementing file accesses that should be done in a background thread. But
- * you also always have the option to split accesses into many smaller parts to
- * get concurrency. I guess the only reason for CPU only cart IO is that you
- * need to allocate DMA channel for more important work.
+ * See cart.h for more details.
  *
- * 3. Using DMA for file transfers are *not* quarantied to use DMA unless a
- * bunch of alignment constraints are met. See cart.h
+ * The above constraints can be met by carefully structuring your data in the
+ * ROM image. It could be usefull for fast loading of overlays and streaming
+ * graphics content directly from ROM to VRAM.
  *
- * 4. Asynchronicity is only really possible using DMA transfers and the CPU
- * doing work from cache and TCM memory only, since DMA work blocks the CPU from
- * the memory bus. Thread switching and interrupt handlers will most likely
- * block if main memory can't be accessed, so getting that to work is probably
- * tricky.
- *
- * 5. The async option only make sense in conjunction with DMA transfers.
- *
- * Conclusion: Async file operation is almost useless as a feature IMHO.
- * Blocking DMA transfers might be useful, from a performance perspective, but
- * require some work and planning to get max performance. Since Flash carts have
- * custom (cart) IO implementations it will be basically imposible to tell in
- * the general case if DMA and async operation is even used at all. Add to this
- * the fact that SD cards also differ wildly in IO performance. Designing your
- * program to be very conservative regarding IO performance is probably a good
- * idea.
+ * It seems that non-blocking file reads are supported. *But* asynchronicity is
+ * only really possible using DMA transfers and the CPU doing work from cache
+ * and TCM memory only, since DMA work blocks the CPU from the memory bus. Maybe
+ * it can be used as some sort of fire-and-forget file reads.
  *
  * NOTE: To see how file loading is performed by the SDK at a lower level see
  * cart.h

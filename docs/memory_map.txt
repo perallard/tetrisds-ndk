@@ -86,7 +86,7 @@ ARM9 static 'Firmware' memory layout (main RAM):
 
 ARM9 section (test, data and BSS) locations (at run-time)
   0x02000800 - 0x0205a0cf .text        ~90k ARM instructions
-    0x02026500 - 0x02051000 .text Tetris game
+    0x02026500 ~ 0x02051000 .text Tetris game
 
   0x0205a0d0 - ?            .data, .rodata, ...
     0x0205f11a - 0x0208d74a wchar string data

@@ -115,6 +115,7 @@ extern struct cart
   struct thread worker_thread;  // 0x44
   int unk16;             // 0xfc
   int unk17;             // 0x100
+  // ?
   struct thread *unk20;  // 0x104
   // Set to 4 by ndk_cart_init
   int worker_thread_priority;   // 0x108
@@ -124,7 +125,9 @@ extern struct cart
   // bit 1: ?
   // bit 2: 1 == transfer ongoing | busy
   // bit 3: 1 == handler set
-  // bit 5:
+  // bit 4: ?
+  // bit 5: ?
+  // bit 6: backup ?
   unsigned int flags;    // 0x114
   int unk18;             // 0x118
   int unk19;             // 0x11c
@@ -150,11 +153,11 @@ void ndk_cart_init(void);
  * Low level cart data read.
  *
  * If dma transfer is requested. This function will try use DMA to transfer all
- * data to its destination but it will fall back to CPU if a number of alignment
- * requirements are not met. See ndk_cart_dma_read_data for more details. Even
- * when falling back to CPU there will be alignment requirements
- * see ndk_cart_cpu_read_data. Long story short in the worst case data might be
- * read by CPU using a double buffer scheme.
+ * data to its destination but will use CPU transfer if a number of requirements
+ * are not met. See ndk_cart_dma_read_data for more details. Even when falling
+ * back to CPU there will be requirements see ndk_cart_cpu_read_data. Long story
+ * short in the worst case data might be read by CPU using a double buffer
+ * scheme.
  *
  * NOTE: This function will block if there is an ongoing cart read.
  *
@@ -185,10 +188,8 @@ void ndk_cart_read(unsigned dma_channel, unsigned int src, void *dst,
  * it else it yields, in an endless loop. Once it has yelded it is only awoken
  * again by a call to ndk_cart_thread_set_handler_and_start.
  *
- * It's used when priority elevation is needed by some internal task. To prevent
- * threads from preemting the cart IO operation. One such case is when async DMA
- * transfer has been requested but it must fallback to CPU transfer (due to
- * umnet alignment requirements).
+ * It's used when when async DMA transfer has been requested but it must
+ * fallback to CPU transfer.
  */
 void ndk_cart_thread_fcn(void);
 
@@ -228,8 +229,6 @@ unsigned int ndk_cart_get_rom_id(void);
  * NOTE: This function is used by ndk_cart_read when any of the conditions
  * above are not met.
  *
- * NOTE: This is probably only a helper function to ndk_cart_read.
- *
  * @param tmp
  */
 void ndk_cart_cpu_read_data(struct cart_read_buf *tmp);
@@ -238,7 +237,7 @@ void ndk_cart_cpu_read_data(struct cart_read_buf *tmp);
  * Read data from cart using DMA.
  *
  * This function will set up a cart transfer complete IRQ handler and start
- * a DMA read by calling ndk_cart_start_dma_read. The IRQ handler will in trun
+ * a DMA read by calling ndk_cart_start_dma_read. The IRQ handler will in turn
  * check if more data needs to be transfered, if so start a new DMA read by
  * calling ndk_cart_start_dma_read again and again until there is no more bytes
  * to be transfered.
@@ -251,8 +250,6 @@ void ndk_cart_cpu_read_data(struct cart_read_buf *tmp);
  * transfer completion interrupt will be executed in between data blocks. Thus
  * has a chance to run, but with a slight delay.
  *
- * NOTE: This is most likely a helper function to ndk_cart_read.
- *
  * The following values in cart_state must be setup before a call to this
  * function:
  *   cart_state.src == ROM start address
@@ -260,8 +257,11 @@ void ndk_cart_cpu_read_data(struct cart_read_buf *tmp);
  *   cart_state.count == number of bytes to read
  *   cart_state.dma_channel == DMA channel to use
  *
- * NOTE: If dst is not aligned with 4 or src is not aligned with 512 or count
- * is not a multiple of 512 or is 0 no DMA read will be started.
+ * NOTE: If the following constraints are not met, DMA data read won't start:
+ *
+ * If dst is not aligned with 4. If dst if is in ITCM of DTCM (only CPU can
+ * access those memory areas). If src is not aligned with 512. If count is not a
+ * multiple of 512. If count is 0.
  *
  * NOTE: Used by ndk_cart_read.
  *
@@ -293,12 +293,6 @@ void ndk_cart_dma_read_complete_irq_handler(void);
  * NOTE: This is most likely a helper function to ndk_cart_dma_read_data.
  *
  * NOTE: The function will always read 512 bytes.
- *
- * NOTE: There are strict alignmet rules to follow when settings the dst and
- * src variables. The dst address must align to 4 and the src address must
- * align to 512.
- *
- * NOTE: Used by ndk_cart_read.
  */
 void ndk_cart_start_dma_read(void);
 
