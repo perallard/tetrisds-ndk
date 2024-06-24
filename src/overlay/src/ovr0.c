@@ -2,6 +2,7 @@
 #include "gfx.h"
 #include "interrupts.h"
 #include "nds.h"
+#include "util.h"
 
 #include "common.h"
 

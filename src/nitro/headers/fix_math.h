@@ -8,8 +8,6 @@
 #ifndef FIX_MATH_INCLUDE_FILE
 #define FIX_MATH_INCLUDE_FILE
 
-#define fix12_one (1 << 12)
-
 /**
  * This is the main fixed point type. It's 32 bits wide with a 20 bit signed
  * integer part and a 12 bit fractional part.
@@ -205,16 +203,6 @@ inline fix12 ndk_fix_cos(fix_angle alpha)
 inline fix12 ndk_fix_sin(fix_angle alpha)
 {
     return fix_trig_table[FIX_ANGLE_TO_TABLE_INDEX(alpha)].sin;
-}
-
-/**
- * Multiply two fix point values.
- *
- * This function should perhaps be placed in a fix_math_extend module.
- */
-inline fix12 fix_mul(fix12 a, fix12 b)
-{
-    return ((long long)a * b) >> 12;
 }
 
 #endif // FIX_MATH_INCLUDE_FILE
