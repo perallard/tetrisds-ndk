@@ -3,24 +3,23 @@
  *
  * Some notes about the file API
  *
- * DMA will only be used if:
+ * The API can be configured to use DMA for transfers from ROM to RAM. *But* DMA
+ * will only be used if:
  *  1. File system has been initialized to use DMA.
  *  2. The ROM source address is aligned with 512.
  *  3. The destination address is aligned with 4.
  *  4. The destination address is *not* in ITCM of DTCM.
  *  5. Read size is a multiple of 512.
  *
- * See cart.h for more details.
- *
  * The above constraints can be met by carefully structuring your data in the
- * ROM image. It could be usefull for fast loading of overlays and streaming
- * graphics content directly from ROM to VRAM.
+ * ROM image. It could be useful for fast loading of overlays and streaming
+ * graphics content directly from ROM to VRAM. But in reality it might not make
+ * any real difference when running of flash carts. Because the low level read
+ * functions get patched by the cart firmware.
  *
- * It seems that non-blocking file reads are supported. *But* asynchronicity is
- * only really possible using DMA transfers and the CPU doing work from cache
- * and TCM memory only, since DMA work blocks the CPU from the memory bus. Maybe
- * it can be used as some sort of fire-and-forget file reads.
- *
+ * It seems that non-blocking file reads are supported. How this us useful is
+ * not understood.
+ * 
  * NOTE: To see how file loading is performed by the SDK at a lower level see
  * cart.h
  *
@@ -375,8 +374,7 @@ int ndk_file_central_dispatch(struct file *h, int operation);
  * @param h the file handle
  * @param dest the memory location the read data is to be stored
  * @param count the number of bytes to read
- * @param async non-blocking operation or not. Non-blocking operation only makes
- * sense if the file system was initialized to use DMA.
+ * @param async non-blocking operation or not
  * @return number of bytes read or -1 if the read operation failed. In the async
  * case count is always returned.
  */

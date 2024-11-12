@@ -30,6 +30,8 @@ See: How to export environment variables in linux.
 
 ## Notes
 
+## Credits
+
 The font used by the src/util project was found here: https://github.com/dhepper/font8x8
 
 ## Radare2

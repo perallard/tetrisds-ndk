@@ -17,12 +17,12 @@
  * // screen space coordinates.
  * ndk_touch_set_coordinate_transform(&xform);
  *
- * // Get raw touch sample
+ * // To get a touch sample do
  *
  * struct touch_pos *raw;
  * struct touch_pos coords;
  *
- * // Will apply the set transform to raw and stored in coords.
+ * // Will apply the set transform to raw and store the result in coords.
  * ndk_touch_transform_into_screen_coords(&coords, &raw);
  *
  * // Use data in coords ...
@@ -60,7 +60,7 @@ extern int touch_initialised;
 /**
  * Touch state memory layout
  *
- * NOTE: Don't access these values directly. They are define here only for
+ * NOTE: Don't access these values directly. They are defined here only for
  * reference.
  */
 extern struct {

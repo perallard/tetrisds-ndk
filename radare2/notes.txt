@@ -6,7 +6,7 @@ crt0 sections table in the arm9 binary.
    0x020a5a18  <-- section info array end
    0x020a5380  <-- section data start
 
-Entries in the array has the folloing format:
+Entries in the array has the following format:
    {
       u32 address,
       u32 text_data_size,

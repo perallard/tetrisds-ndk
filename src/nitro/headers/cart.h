@@ -184,7 +184,7 @@ void ndk_cart_read(unsigned dma_channel, unsigned int src, void *dst,
  * This is the worker function that run in the cart thread.
  * 
  * It checks if a handler function has been set, see
- * ndk_cart_thread_set_handler_and_start. If it a handler has been set executes
+ * ndk_cart_thread_set_handler_and_start. If a handler has been set it executes
  * it else it yields, in an endless loop. Once it has yelded it is only awoken
  * again by a call to ndk_cart_thread_set_handler_and_start.
  *
