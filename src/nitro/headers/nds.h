@@ -391,7 +391,7 @@ struct owner_info {
  * Get owner info.
  *
  * NOTE: reads owner data from 0x027ffc80 and not from the firmware.
- * See: file:///home/per/source/nintendo/gbatek/gbatek.htm#dsfirmwareusersettings
+ * See: http://problemkaputt.de/gbatek-ds-firmware-user-settings.htm
  */
 void ndk_get_owner_info(struct owner_info *info);
 

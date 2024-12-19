@@ -211,7 +211,8 @@ void *ndk_get_bg2_screen_base_addr_engine_b(void);
 /**
  * Set the affine transform parameters.
  * 
- * See: file:///home/per/source/nintendo/gbatek/GBATEK%20-%20GBA_NDS%20Technical%20Info.htm#lcdiobgrotationscaling
+ * See: http://problemkaputt.de/gbatek-lcd-i-o-bg-rotation-scaling.htm
+ * and: http://problemkaputt.de/gbatek-ds-video-bg-modes-control.htm
  * 
  * @param BGxPA address of the BG PA register
  * @param transform a 2x2 matrix [A, B, C, D]
