@@ -1,10 +1,10 @@
 /**
  * Graphics functions.
  *
- * None of the other SDK subsystems seem to be dependent on this one. So it's
- * probably safe to roll your own graphics functions.
+ * This module is just a bunch of convenience functions. None of the other SDK
+ * subsystems seem to be dependent on this one. So it's probably safe to roll
+ * your own graphics functions.
  *
- * TODO: prefix all functions with 'ndk_gfx_'
  * TODO: make function names more readable
  */
 #ifndef GFX_INCLUDE_FILE
@@ -16,65 +16,21 @@
 #include "fix_math.h"
 
 /**
- * Display Modes for engine A
+ * Display Modes for engine A.
+ *
+ * First agument to ndk_set_display_mode_engine_a.
  */
-#define ENGINE_A_DISPLAY_MODE_OFF 0
-#define ENGINE_A_DISPLAY_MODE_GRAPHICS 1
 
+// Turn display off. Screen becomes white.
+#define ENGINE_A_DISPLAY_MODE_OFF 0
+// Use BG and OBJ layers
+#define ENGINE_A_DISPLAY_MODE_GRAPHICS 1
+// All modes below just display raw 15bit RGB bitmap images
 #define ENGINE_A_DISPLAY_MODE_BITMAP_VRAM_A 2
 #define ENGINE_A_DISPLAY_MODE_BITMAP_VRAM_B 6
 #define ENGINE_A_DISPLAY_MODE_BITMAP_VRAM_C 10
 #define ENGINE_A_DISPLAY_MODE_BITMAP_VRAM_D 14
-
 #define ENGINE_A_DISPLAY_MODE_BITMAP_MAIN_RAM 3
-
-/**
- * 3D engine commands. Used when writing commands to the command fifo.
- */
-#define CMD_NOOP 0x00
-#define CMD_MTX_MODE 0x10
-#define CMD_MTX_PUSH 0x11
-#define CMD_MTX_POP  0x12
-#define CMD_MTX_STORE 0x13
-#define CMD_MTX_RESTORE 0x14
-#define CMD_MTX_IDENTITY 0x15
-#define CMD_MTX_LOAD_4x4 0x16
-#define CMD_MTX_LOAD_3x3 0x17
-#define CMD_MTX_MULT_4x4 0x18
-#define CMD_MTX_MULT_4x3 0x19
-#define CMD_MTX_MULT_3x3 0x1a
-#define CMD_MTX_SCALE 0x1b
-#define CMD_MTX_TRANS 0x1c
-
-#define CMD_COLOR 0x20
-#define CMD_NORMAL 0x21
-#define CMD_TEXCOORD 0x22
-#define CMD_VTX_16 0x23
-#define CMD_VTX_10 0x24
-#define CMD_VTX_XY 0x25
-#define CMD_VTX_XZ 0x26
-#define CMD_VTX_YZ 0x27
-#define CMD_VTX_DIFF 0x28
-#define CMD_POLYGON_ATTR 0x29
-#define CMD_TEXIMAGE_PARAM 0x2a
-#define CMD_TEXPLTT_BASE 0x2b
-
-#define CMD_DIF_AMB 0x30
-#define CMD_SPE_EMI 0x31
-#define CMD_LIGHT_VECTOR 0x32
-#define CMD_LIGHT_COLOR 0x33
-#define CMD_SHININESS 0x34
-
-#define CMD_BEGIN_VTXS 0x40
-#define CMD_END_VTXS 0x41
-
-#define CMD_SWAP_BUFFERS 0x50
-
-#define CMD_VIEWPORT 0x60
-
-#define CMD_BOX_TEST 0x70
-#define CMD_POS_TEST 0x71
-#define CMD_VEC_TEST 0x72
 
 /**
  * State variable used by the functions:
@@ -106,22 +62,23 @@ extern unsigned short gfx_display_mode_engine_a;
 extern unsigned int gfx_dma_number;
 
 /**
- * Set modes for 3D/2D engine A
+ * Set modes for 3D/2D engine A.
  *
- * BG Modes
- *
- * Mode  BG0      BG1      BG2      BG3
- * 0     Text/3D  Text     Text     Text
- * 1     Text/3D  Text     Text     Affine
- * 2     Text/3D  Text     Affine   Affine
- * 3     Text/3D  Text     Text     Extended
- * 4     Text/3D  Text     Affine   Extended
- * 5     Text/3D  Text     Extended Extended
- * 6     3D       -        Large    -
- *
+ * @param disp_mode display mode
+ *  See defines above for posible input values.
  * @param bg_mode 0-6
- * @param disp_mode the display mode
- * @param if bg0_3d true = use 3D engine for BG0
+ *  Only applicable if disp_mode is set to ENGINE_A_DISPLAY_MODE_GRAPHICS
+ *
+ *      Mode  BG0      BG1      BG2      BG3
+ *      0     Text/3D  Text     Text     Text
+ *      1     Text/3D  Text     Text     Affine
+ *      2     Text/3D  Text     Affine   Affine
+ *      3     Text/3D  Text     Text     Extended
+ *      4     Text/3D  Text     Affine   Extended
+ *      5     Text/3D  Text     Extended Extended
+ *      6     3D       -        Large    -
+ * @param bg0_3d use 3D engine for BG0 only applicable if disp_mode is set to
+ *  ENGINE_A_DISPLAY_MODE_GRAPHICS
  */
 void ndk_set_display_mode_engine_a(int disp_mode, int bg_mode, bool bg0_3d);
 

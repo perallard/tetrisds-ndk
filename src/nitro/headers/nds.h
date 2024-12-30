@@ -196,7 +196,56 @@
 #define GXFIFO (*(volatile unsigned int *) 0x4000400)
 
 /**
- * 3D engine command ports.
+ * 3D engine commands. Used when writing commands to the command fifo (GXFIFO).
+ */
+#define CMD_NOOP 0x00
+#define CMD_MTX_MODE 0x10
+#define CMD_MTX_PUSH 0x11
+#define CMD_MTX_POP  0x12
+#define CMD_MTX_STORE 0x13
+#define CMD_MTX_RESTORE 0x14
+#define CMD_MTX_IDENTITY 0x15
+#define CMD_MTX_LOAD_4x4 0x16
+#define CMD_MTX_LOAD_3x3 0x17
+#define CMD_MTX_MULT_4x4 0x18
+#define CMD_MTX_MULT_4x3 0x19
+#define CMD_MTX_MULT_3x3 0x1a
+#define CMD_MTX_SCALE 0x1b
+#define CMD_MTX_TRANS 0x1c
+
+#define CMD_COLOR 0x20
+#define CMD_NORMAL 0x21
+#define CMD_TEXCOORD 0x22
+#define CMD_VTX_16 0x23
+#define CMD_VTX_10 0x24
+#define CMD_VTX_XY 0x25
+#define CMD_VTX_XZ 0x26
+#define CMD_VTX_YZ 0x27
+#define CMD_VTX_DIFF 0x28
+#define CMD_POLYGON_ATTR 0x29
+#define CMD_TEXIMAGE_PARAM 0x2a
+#define CMD_TEXPLTT_BASE 0x2b
+
+#define CMD_DIF_AMB 0x30
+#define CMD_SPE_EMI 0x31
+#define CMD_LIGHT_VECTOR 0x32
+#define CMD_LIGHT_COLOR 0x33
+#define CMD_SHININESS 0x34
+
+#define CMD_BEGIN_VTXS 0x40
+#define CMD_END_VTXS 0x41
+
+#define CMD_SWAP_BUFFERS 0x50
+
+#define CMD_VIEWPORT 0x60
+
+#define CMD_BOX_TEST 0x70
+#define CMD_POS_TEST 0x71
+#define CMD_VEC_TEST 0x72
+
+/**
+ * 3D engine command ports. Used when writing commands directly to the 3D
+ * engine.
  */
 #define MTX_MODE (*(volatile unsigned int *) 0x4000440)
 #define MTX_PUSH (*(volatile unsigned int *) 0x4000444)
