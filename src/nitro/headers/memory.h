@@ -1,6 +1,9 @@
 /**
  * Memory copy and fill functions.
  *
+ * For all functions below it's the callers responsability that all memory
+ * alignment requirements are met.
+ *
  * NOTE: Parts of this module also resides in ITCM.
  */
 #ifndef MEMORY_INCLUDE_FILE

@@ -123,11 +123,11 @@ _ = Game
 
 SDK subsystem dependency map (not complete). The purpose of this map is to give
 a overview of what modules *must* be kept and used. Which ones can be skipped or
-replaced or even overwritten in memory, if we need the space.
+replaced or even overwritten in memory, if the space is needed for other things.
 
 use         dependencies
 
-*backup:    thread, cart, ipc
+*backup:    thread, cart, ipcu
 bios_ram:   ?
 cart:       thread, memory, ipc
 cpu:        none
@@ -140,7 +140,7 @@ heap:       none
 interrupts: thread, dtcm, itcm
 ipc:        interrupts, thread (critical section)
 itcm:       interrupts, memory, thread, dtcm
-memory:     cpu, *DMA, itcm
+memory:     cpu, interrupts, *DMA, itcm
 *nds:       ?
 overlay:    file
 sound:      file, thread, ipc, libc (div/mod)
