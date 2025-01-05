@@ -136,10 +136,10 @@ void init()
       ndk_panic();
 
     ndk_touch_set_coordinate_transform(&xform);
-    ndk_irq_set_handler(IE_VBLANK, &vblank_handler);
+    ndk_irq_set_handler(IS_VBLANK, &vblank_handler);
     ndk_gfx_init();
     // Enable V-Blank IRQ
-    ndk_irq_enable_interrupt_sources(IE_VBLANK);
+    ndk_irq_enable_interrupt_sources(IS_VBLANK);
     // Master IRQ enable
     IME = 1;
     ndk_cpu_enable_irq();
@@ -148,7 +148,7 @@ void init()
 
 void vblank_handler(void)
 {
-  thread_irq_bits |= 1;
+  thread_irq_bits |= IS_VBLANK;
 }
 
 void read_key_presses()

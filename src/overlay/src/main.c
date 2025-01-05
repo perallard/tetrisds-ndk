@@ -59,9 +59,9 @@ int main()
 void init()
 {
     ndk_platform_init();
-    ndk_irq_set_handler(IE_VBLANK, &vblank_handler);
+    ndk_irq_set_handler(IS_VBLANK, &vblank_handler);
     ndk_gfx_init();
-    ndk_irq_enable_interrupt_sources(IE_VBLANK);
+    ndk_irq_enable_interrupt_sources(IS_VBLANK);
     // Master IRQ enable
     IME = 1;
     ndk_cpu_enable_irq();
@@ -80,7 +80,7 @@ void init_fs(void)
 
 void vblank_handler(void)
 {
-  thread_irq_bits |= 1;
+  thread_irq_bits |= IS_VBLANK;
 }
 
 void init_gfx(void)

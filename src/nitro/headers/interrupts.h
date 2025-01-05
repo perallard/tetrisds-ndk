@@ -196,7 +196,7 @@ void ndk_irq_set_dma_callback(int channel, void (*cb)(void *), void *data);
 /**
  * Sleep the current thread until the next vblank IRQ
  *
- * NOTE: This function calls ndk_thread_wait_irq(true, IE_VBLANK)
+ * NOTE: This function calls ndk_thread_wait_irq(true, IS_VBLANK)
  */
 void ndk_wait_vblank_intr(void);
 
