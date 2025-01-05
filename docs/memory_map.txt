@@ -143,7 +143,7 @@ itcm:       interrupts, memory, thread, dtcm
 memory:     cpu, interrupts, *DMA, itcm
 *nds:       ?
 overlay:    file
-sound:      file, thread, ipc, libc (div/mod)
+sound:      file, memory, thread, ipc, libc (div/mod)
 thread:     cpu, interrupts, timers, itcm, dtcm
 timers:     thread
 touch:      *accelerator, interrupts, thread, cpu

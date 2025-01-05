@@ -14,8 +14,8 @@
  * The above constraints can be met by carefully structuring your data in the
  * ROM image. It could be useful for fast loading of overlays and streaming
  * graphics content directly from ROM to VRAM. But in reality it might not make
- * any real difference when running of flash carts. Because the low level read
- * functions get patched by the cart firmware.
+ * any real difference when running from flash carts. Because the low level read
+ * functions get patched by the flash cart firmware.
  *
  * It seems that non-blocking file reads are supported. How this us useful is
  * not understood.
@@ -90,7 +90,7 @@ struct file
    * open, read and close functions. This member variable can be used to check
    * if a read operation succeded or not in the async case.
    *
-   * 0 == OK / SUCCESS
+   * 0 == DONE / SUCCESS ?
    * 2 == ?
    * 6 == ?
    */
@@ -360,7 +360,7 @@ int ndk_file_central_dispatch(struct file *h, int operation);
  *       // perform read
  *
  *       // check
- *       if (h.error == SUCCESS) {
+ *       if (h.error == 0) {
  *          // check that we got all requested bytes
  *          if ((h.current_offset - old_offset) == count) {
  *              // all ok

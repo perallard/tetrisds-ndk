@@ -2,7 +2,16 @@
  * Memory copy and fill functions.
  *
  * For all functions below it's the callers responsability that all memory
- * alignment requirements are met.
+ * alignment requirements are met for source, destination and size parameters.
+ *
+ * To be compatible with the SDK when using your own DMA routines follow these
+ * rules:
+ *
+ * 1. Always wait for the DMA enable control bit to be zero before a transfer
+ *    is started.
+ *
+ * 2. Always put DMA register accesses in an critical section (use
+ *    ndk_thread_critical_enter).
  *
  * NOTE: Parts of this module also resides in ITCM.
  */
@@ -11,6 +20,9 @@
 
 /**
  * Copy memory DMA async.
+ *
+ * NOTE: This function resides in MAIN RAM so it's not guarantued to be
+ * asynchronous unless all code/data is cached already.
  *
  * NOTE: This function will block if there are any ongoing transfers on the
  * choosen DMA channel. When blocked IRQs (CPSR) are disabled. So all threads
@@ -22,7 +34,7 @@
  * @param channel 0-3 See DMA0-3
  * @param source
  * @param dest
- * @param size number of bytes to fill/copy. Must be less than 2^21.
+ * @param size number of bytes to copy. Must be less than 2^21.
  * @param data parameter passed to the callback function
  * @param callback function that will be called when the transfer is complete.
  *        NULL is a valid argument, if no callback is needed.
@@ -34,6 +46,9 @@ void ndk_memory_dma_32bit_copy_async(int channel, void *source,
 /**
  * Fill memory DMA async.
  *
+ * NOTE: This function resides in MAIN RAM so it's not guarantued to be
+ * asynchronous unless all code/data is cached already.
+ *
  * NOTE: This function will block if there are any ongoing transfers on the
  * choosen DMA channel. When blocked IRQs (CPSR) are disabled. So all threads
  * and IRQ handlers are blocked from executing.
@@ -44,9 +59,9 @@ void ndk_memory_dma_32bit_copy_async(int channel, void *source,
  * @param channel 0-3 See DMA0-3
  * @param dest
  * @param pattern memory will be filled this 32bit wide pattern.
- * @param size number of bytes to fill/copy. Must be less than 2^21.
+ * @param size number of bytes to fill. Must be less than 2^21.
  * @param data parameter passed to the callback function
- * @param callback function that will be called when the transfer is complete.
+ * @param callback function that will be called when the fill is complete.
  *        NULL is a valid argument, if no callback is needed.
  */
 void ndk_memory_dma_32bit_fill_async(int channel, void *dest,
@@ -56,7 +71,7 @@ void ndk_memory_dma_32bit_fill_async(int channel, void *dest,
 /**
  * 16bit DMA memory copy.
  *
- * NOTE: This function will wait/block for any ongoing transfers to finish
+ * NOTE: This function will wait for any ongoing transfers to finish
  * before starting the requested one.
  *
  * @param channel 0-3 See DMA0-3
@@ -70,7 +85,7 @@ void ndk_memory_dma_16bit_copy(int channel, void *source, void *dest,
 /**
  * 16bit DMA memory fill.
  *
- * NOTE: This function will wait/block for any ongoing transfers to finish
+ * NOTE: This function will wait for any ongoing transfers to finish
  * before starting the requested one.
  *
  * @param channel 0-3 See DMA0-3
@@ -84,7 +99,7 @@ void ndk_memory_dma_16bit_fill(int channel, void *dest,
 /**
  * 32bit DMA memory copy.
  *
- * NOTE: This function will wait/block for any ongoing transfers to finish
+ * NOTE: This function will wait for any ongoing transfers to finish
  * before starting the requested one.
  *
  * @param channel 0-3 See DMA0-3
@@ -98,7 +113,7 @@ void ndk_memory_dma_32bit_copy(int channel, void *source, void *dest,
 /**
  * 32bit DMA memory fill.
  *
- * NOTE: This function will wait/block for any ongoing transfers to finish
+ * NOTE: This function will wait for any ongoing transfers to finish
  * before starting the requested one.
  *
  * @param channel 0-3 See DMA0-3
@@ -110,9 +125,7 @@ void ndk_memory_dma_32bit_fill(int channel, void *dest,
                                unsigned int pattern, int size);
 
 /**
- * Memory copy and fill functions.
- *
- * NOTE: Uses CPU to perform the copy and fill operations.
+ * Use CPU to perform memory copy and fill operations.
  *
  * @param size size of the memory region in bytes
  */
@@ -142,10 +155,10 @@ void ndk_memory_fast_32bit_copy(void *source, void *dest, int size);
  * at any offset.
  *
  * @param dest
- * @param c
+ * @param pattern
  * @param size
  */
-void ndk_memory_fill(void *dest, unsigned char c, int size);
+void ndk_memory_fill(void *dest, unsigned char pattern, int size);
 
 /**
  * Copy memory as an array of 8bit values.
