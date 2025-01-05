@@ -7,11 +7,23 @@
  * To be compatible with the SDK when using your own DMA routines follow these
  * rules:
  *
- * 1. Always wait for the DMA enable control bit to be zero before a transfer
- *    is started.
+ * 1. Always wait for the DMA enable control bit to become zero before a
+ *    transfer is started.
  *
- * 2. Always put DMA register accesses in an critical section (use
- *    ndk_thread_critical_enter).
+ * 2. Always put DMA register updates in an critical section.
+ *
+ * Example:
+ *    while (DMA0CNT & 0x80000000)
+ *        ;
+ *
+ *    int lock;
+ *    ndk_thread_critical_enter(&lock);
+ *
+ *    DMA0SAD = src_addr;
+ *    DMA0DAD = dst_addr;
+ *    DMA0CNT = 0x80000000 | count;
+ *
+ *    ndk_thread_critical_leave(&lock);
  *
  * NOTE: Parts of this module also resides in ITCM.
  */

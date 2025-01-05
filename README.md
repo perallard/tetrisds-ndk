@@ -36,6 +36,8 @@ The font used by the src/util project was found here: https://github.com/dhepper
 
 ## Radare2
 
+TODO: how to import the symbols into a radare project.
+
 ## Contribute
 
 Use private function file section template to unclutter the modules. See template below.
