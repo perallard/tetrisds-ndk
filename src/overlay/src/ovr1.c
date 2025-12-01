@@ -6,7 +6,7 @@
 
 #include "common.h"
 
-static fix_angle angle = fix_angle_0;
+static fix_angle angle = FIX_ANGLE_0;
 
 void _overlay1_entry()
 {
@@ -20,14 +20,14 @@ void _overlay1_entry()
 
     ndk_wait_vblank_intr();
 
-    fix12 scale = fix12_one + (ndk_fix_cos(angle) >> 2);
-
     fix12 transform[4] = {
-      scale, 0,
-      0, scale
+      F2X(1), 0,
+      0, F2X(1)
     };
 
-    ndk_bg_set_affine_transform(&BG3PA, transform, 128, 96, 0, 0);
+    int xcoord = (64 * fix_cos(angle)) >> 12;
+
+    ndk_bg_set_affine_transform(&BG3PA, transform, 128, 96, xcoord, 0);
 
     angle += 256;
   }

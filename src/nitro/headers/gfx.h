@@ -150,7 +150,7 @@ void ndk_set_bg_mode_engine_b(int mode);
  * disable master brightness for both engines
  * set rotation to 0 deg and scale to 1 for BG2 and BG3 on both engines
  * 
- * NOTE: This function an only be called once per boot! The second time this
+ * NOTE: This function can only be called once per boot! The second time this
  * function is called the platform locks up.
  */
 void ndk_gfx_init(void);

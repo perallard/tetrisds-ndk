@@ -14,11 +14,6 @@
  */
 typedef int fix12;
 
-#define fix_angle_0 (0x0000)
-#define fix_angle_90 (0x4000)
-#define fix_angle_180 (0x8000)
-#define fix_angle_270 (0xc000)
-
 /**
  * This type represents an angle.
  *
@@ -29,7 +24,7 @@ typedef int fix12;
  * Conversion to degrees or radians is also quite trivial. As is the reverse.
  *
  * It's the return type of the ndk_fix_atan2 function and the input values for
- * the ndk_fix_sin and ndk_fix_cos functions.
+ * the sine and cosine table below.
  */
 typedef unsigned short fix_angle;
 
@@ -47,8 +42,6 @@ typedef short fix12_short;
 
 /**
  * Sine and cosine table.
- *
- * See ndk_fix_cos and ndk_fix_sin for example usage.
  *
  * Since it has 4096 entries using this table will give a precision of
  * 360/4096 degrees.
@@ -88,7 +81,7 @@ int ndk_div(int number, int denom);
  * Perfrom division on two fx values using the HW accelerator.
  *
  * NOTE: This function does not wait for the hardware divider to finish before
- * returning. Call ndk_fix_quotient to to get the result.
+ * returning. Call ndk_fix_div_result to to get the result.
  *
  * @param number
  * @param denom
@@ -99,7 +92,7 @@ void ndk_fix_div_async(fix12 number, fix12 denom);
  * Compute the inverse of a fx value using the HW accelerator.
  *
  * NOTE: This function does not wait for the hardware divider to finish before
- * returning. Call ndk_fix_quotient to to get the result.
+ * returning. Call ndk_fix_div_result to to get the result.
  *
  * @param value
  */
@@ -113,7 +106,7 @@ void ndk_fix_inverse_async(fix12 value);
  *
  * @return
  */
-fix12 ndk_fix_quotient(void);
+fix12 ndk_fix_div_result(void);
 
 /**
  * Reads the DIV_RESULT HW register and returns it as an 64bit signed value
@@ -123,7 +116,7 @@ fix12 ndk_fix_quotient(void);
  *
  * @return the quotient
  */
-long long ndk_64bit_quotient();
+long long ndk_64bit_div_result();
 
 /**
  * Compute the inverse of a fx value using the HW accelerator.
@@ -148,7 +141,7 @@ fix12 ndk_fix_div(fix12 number, fix12 denom);
  * @param[in] v array to a three dimensional verctor.
  * @param[out] res where to put the normalized vector.
  */
-void ndk_fix_normalize_vector(fix12 *v, fix12 *res);
+void ndk_fix_normalize_vector(fix12 v[3], fix12 res[3]);
 
 /**
  * Calculate the 3D cross product of two fx vectors. Storing the result in res.
@@ -157,7 +150,7 @@ void ndk_fix_normalize_vector(fix12 *v, fix12 *res);
  * @param v
  * @param[out] res
  */
-void ndk_fix_cross_product(fix12 *u, fix12 *v, fix12 *res);
+void ndk_fix_cross_product(fix12 u[3], fix12 v[3], fix12 res[3]);
 
 /**
  * Calculate the 3D dot product of two
@@ -167,7 +160,7 @@ void ndk_fix_cross_product(fix12 *u, fix12 *v, fix12 *res);
  * @param v
  * @return The dot product of u and v
  */
-fix12 ndk_fix_dot_product(fix12 *u, fix12 *v);
+fix12 ndk_fix_dot_product(fix12 u[3], fix12 v[3]);
 
 /**
  * Calculate the two argument arctangent. See:
@@ -182,27 +175,5 @@ fix12 ndk_fix_dot_product(fix12 *u, fix12 *v);
  * the point at (x, y).
  */
 fix_angle ndk_fix_atan2(fix12 y, fix12 x);
-
-/**
- * Calculate fix point cosine.
- *
- * @param alpha angle
- * @return Cosine
- */
-inline fix12 ndk_fix_cos(fix_angle alpha)
-{
-    return fix_trig_table[FIX_ANGLE_TO_TABLE_INDEX(alpha)].cos;
-}
-
-/**
- * Calculate fix point sine.
- *
- * @param alpha angle
- * @return Sine
- */
-inline fix12 ndk_fix_sin(fix_angle alpha)
-{
-    return fix_trig_table[FIX_ANGLE_TO_TABLE_INDEX(alpha)].sin;
-}
 
 #endif // FIX_MATH_INCLUDE_FILE

@@ -156,9 +156,16 @@
 
 #define DIVCNT        (*(volatile unsigned short *) 0x4000280)
 #define DIV_NUMER     (*(volatile long long int *) 0x4000290)
+#define DIV_NUMBER    (*(volatile int *) 0x4000290)
 #define DIV_DENOM     (*(volatile long long int *) 0x4000298)
 #define DIV_RESULT    (*(volatile long long int *) 0x40002a0)
+#define DIV_RESULT_32 (*(volatile int *) 0x40002a0)
 #define DIVREM_RESULT (*(volatile long long int *) 0x40002a8)
+#define DIVREM_RESULT_32 (*(volatile int *) 0x40002a8)
+
+#define SQRCNT_MODE_32B 0
+#define SQRCNT_MODE_64B 1
+
 #define SQRTCNT       (*(volatile unsigned short *) 0x40002b0)
 #define SQRT_RESULT   (*(volatile unsigned int *) 0x40002b4)
 #define SQRT_PARAM   (*(volatile unsigned long long int *) 0x40002b8)
@@ -397,7 +404,13 @@ extern volatile unsigned short ext_gamepad;
  * in the secure area. They all use the thumb instruction set.
  */
 
-__attribute__((target("thumb"))) void ndk_svc_wait_by_loop(int delay);
+#ifdef HOST_BUILD
+#define ATTR_TUMB_FUNC
+#else
+#define ATTR_TUMB_FUNC __attribute__((target("thumb")))
+#endif
+
+ATTR_TUMB_FUNC void ndk_svc_wait_by_loop(int delay);
 
 // ----------------------------------------------------------------------------
 //  Init functions

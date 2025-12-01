@@ -123,11 +123,12 @@ _ = Game
 
 SDK subsystem dependency map (not complete). The purpose of this map is to give
 a overview of what modules *must* be kept and used. Which ones can be skipped or
-replaced or even overwritten in memory, if the space is needed for other things.
+replaced or even overwritten in memory. If for instance the space is needed for
+other things.
 
-use         dependencies
+module      dependencies
 
-*backup:    thread, cart, ipcu
+*backup:    thread, cart, ipc
 bios_ram:   ?
 cart:       thread, memory, ipc
 cpu:        none
@@ -135,7 +136,7 @@ crt0:       must be used.
 dtcm:       interrupts, thread, CPU stack
 *file:      thread, cart
 fx_math:    none, *accelerator
-gfx:        memory, fx_math
+gfx:        memory, fx_math, *geom_engine
 heap:       none
 interrupts: thread, dtcm, itcm
 ipc:        interrupts, thread (critical section)
@@ -151,6 +152,7 @@ touch:      *accelerator, interrupts, thread, cpu
 nds: currently a place hold definitions that don't have a clear module yet.
 accelerator: math hardware accelerator. It's probably safe to use accelerator
              hardware directly without it interfering with the SDK.
+geom_engine: matrix hardware accelerator and 3D engine.
 DMA: dma hardware.
 file: subsystem/module can be initialized to not use DMA for data transfers.
 backup: does not seem to use DMA data transfers.

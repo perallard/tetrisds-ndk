@@ -6,7 +6,7 @@ crt0 sections table in the arm9 binary.
    0x020a5a18  <-- section info array end
    0x020a5380  <-- section data start
 
-Entries in the array has the following format:
+Entries in the array have the following format:
    {
       u32 address,
       u32 text_data_size,
@@ -23,10 +23,10 @@ Mapping the ITCM and DTCM blocks in radare2:
 Use the 'om' commmand. It will print the currently mapped memory regions. Note
 the fd (file descriptor number). Assume fd is 3. Execute the following commands
 
-om    3    0x01ff8000  0x620   0xa9380 rwx      fmap.arm9.itcm
-om    3    0x027c0000  0x60    0xa99a0 rw       fmap.arm9.dtcm
+input: fd   vaddr       size    padder  flags    name
 
-      fd   vaddr       size    padder  flags    name
+>om    3    0x01ff8000  0x620   0xa9380 rwx      fmap.arm9.itcm
+>om    3    0x027c0000  0x60    0xa99a0 rw       fmap.arm9.dtcm
 
 fd is the file descriptor for the ARM9 binary. It's mapped automatically if you
 started radare2 with the ROM as input file.

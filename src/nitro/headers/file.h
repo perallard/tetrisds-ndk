@@ -310,13 +310,13 @@ bool ndk_file_open_by_rom_range(struct file *h, struct fat_volume *fs, int start
  * The file must have be opened prior to this call otherwise the result is
  * unpredictable.
  *
- * NOTE: This function was added here for convenience. It's not pressent in
+ * NOTE: This function was added here for convenience. It's not present in
  * this form anywhere in the ROM.
  *
  * @param h file handle
  * @return fiĺe size in bytes
  */
-inline int ndk_file_size(struct file *h)
+static inline int ndk_file_size(struct file *h)
 {
   return h->end_offset - h->start_offset;
 }
@@ -359,7 +359,7 @@ int ndk_file_central_dispatch(struct file *h, int operation);
  *       int count = 68;
  *       // perform read
  *
- *       // check
+ *       // later check
  *       if (h.error == 0) {
  *          // check that we got all requested bytes
  *          if ((h.current_offset - old_offset) == count) {
@@ -374,7 +374,8 @@ int ndk_file_central_dispatch(struct file *h, int operation);
  * @param h the file handle
  * @param dest the memory location the read data is to be stored
  * @param count the number of bytes to read
- * @param async non-blocking operation or not
+ * @param async defer read operation to after this thread has yielded or start
+ * immediately.
  * @return number of bytes read or -1 if the read operation failed. In the async
  * case count is always returned.
  */

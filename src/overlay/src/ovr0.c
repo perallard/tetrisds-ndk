@@ -6,7 +6,7 @@
 
 #include "common.h"
 
-static fix_angle angle = fix_angle_0;
+static fix_angle angle = FIX_ANGLE_0;
 
 void _overlay0_entry()
 {
@@ -21,13 +21,13 @@ void _overlay0_entry()
     ndk_wait_vblank_intr();
 
     // Create a 2d clockwise rotation matrix
-    fix12 inv = ndk_fix_inverse(fix12_one);
+    fix12 inv = ndk_fix_inverse(F2X(1));
 
     fix12 transform[4] = {
-      fix_mul(inv, ndk_fix_cos(angle)),
-      fix_mul(inv, ndk_fix_sin(angle)),
-      fix_mul(inv, -ndk_fix_sin(angle)),
-      fix_mul(inv, ndk_fix_cos(angle))
+      fix_mul(inv, fix_cos(angle)),
+      fix_mul(inv, fix_sin(angle)),
+      fix_mul(inv, -fix_sin(angle)),
+      fix_mul(inv, fix_cos(angle))
     };
 
     ndk_bg_set_affine_transform(&BG3PA, transform, 128, 96, 0, 0);

@@ -4,14 +4,42 @@
 #include "nds.h"
 #include "fix_math.h"
 
-#define fix12_one (1 << 12)
+#define FIX_SCALE 12
+#define F2X(f) (fix12)((f) * (1 << FIX_SCALE))
+
+#define FIX_ANGLE_0 (0x0000)
+#define FIX_ANGLE_90 (0x4000)
+#define FIX_ANGLE_180 (0x8000)
+#define FIX_ANGLE_270 (0xc000)
 
 /**
  * Multiply two fix point values.
  */
 inline fix12 fix_mul(fix12 a, fix12 b)
 {
-    return ((long long)a * b) >> 12;
+    return ((long long)a * b) >> FIX_SCALE;
+}
+
+/**
+ * Calculate fix point cosine.
+ *
+ * @param alpha angle
+ * @return Cosine
+ */
+static inline fix12 fix_cos(fix_angle alpha)
+{
+    return fix_trig_table[FIX_ANGLE_TO_TABLE_INDEX(alpha)].cos;
+}
+
+/**
+ * Calculate fix point sine.
+ *
+ * @param alpha angle
+ * @return Sine
+ */
+static inline fix12 fix_sin(fix_angle alpha)
+{
+    return fix_trig_table[FIX_ANGLE_TO_TABLE_INDEX(alpha)].sin;
 }
 
 /**
