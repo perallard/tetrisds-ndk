@@ -404,13 +404,7 @@ extern volatile unsigned short ext_gamepad;
  * in the secure area. They all use the thumb instruction set.
  */
 
-#ifdef HOST_BUILD
-#define ATTR_TUMB_FUNC
-#else
-#define ATTR_TUMB_FUNC __attribute__((target("thumb")))
-#endif
-
-ATTR_TUMB_FUNC void ndk_svc_wait_by_loop(int delay);
+__attribute__((target("thumb"))) void ndk_svc_wait_by_loop(int delay);
 
 // ----------------------------------------------------------------------------
 //  Init functions
