@@ -155,8 +155,8 @@
 #define DIVCNT_MODE_64B_DIV_64B 2
 
 #define DIVCNT        (*(volatile unsigned short *) 0x4000280)
+#define DIV_NUMER_32  (*(volatile int *) 0x4000290)
 #define DIV_NUMER     (*(volatile long long int *) 0x4000290)
-#define DIV_NUMBER    (*(volatile int *) 0x4000290)
 #define DIV_DENOM     (*(volatile long long int *) 0x4000298)
 #define DIV_RESULT    (*(volatile long long int *) 0x40002a0)
 #define DIV_RESULT_32 (*(volatile int *) 0x40002a0)

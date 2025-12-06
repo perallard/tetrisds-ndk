@@ -3,10 +3,10 @@
 #include "interrupts.h"
 #include "nds.h"
 #include "util.h"
-
+#include "ovr.h"
 #include "common.h"
 
-static fix_angle angle = FIX_ANGLE_0;
+static fix12 angle = 0;
 
 void _overlay1_entry()
 {
@@ -25,10 +25,10 @@ void _overlay1_entry()
       0, F2X(1)
     };
 
-    int xcoord = (64 * fix_cos(angle)) >> 12;
+    int xcoord = fix_mul(64, tcm1_cos(angle));
 
     ndk_bg_set_affine_transform(&BG3PA, transform, 128, 96, xcoord, 0);
 
-    angle += 256;
+    angle += 16;
   }
 }

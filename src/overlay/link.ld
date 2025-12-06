@@ -51,9 +51,25 @@ SECTIONS
 
     /* Allocate 4Kb to DTCM memory area. The rest is left for stack   */
     /* usage by the firmware code. See nitro/heap.h for more details. */
-    dtcm_area_start_patch DTCM_area_size : {
+    dtcm_area_size_patch DTCM_area_size : {
         LONG(0xfffff000)
     } AT>dummy
+    dtcm_area_size_patch DTCM_area_size_2 : {
+        LONG(0xfffff000)
+    } AT>dummy
+
+    dtcm_area_start_patch DTCM_area_start : {
+        LONG(DTCM_HEAP_START)
+    } AT>dummy
+
+    dtcm_area_start_patch DTCM_area_start_2 : {
+        LONG(DTCM_HEAP_START)
+    } AT>dummy
+
+    dtcm_area_start_patch DTCM_area_start_3 : {
+        LONG(DTCM_HEAP_START)
+    } AT>dummy
+
 
     /* Section definitions for the overlays must come before the    */
     /* section definitions for the main binary because of how LD    */
@@ -80,4 +96,8 @@ SECTIONS
     HEAP_START = OVERLAY_START + OVERLAY_RAM_SIZE;
 
     ITCM_OVERLAY_START = ITCM_START;
+
+    DTCM_OVERLAY_START = DTCM_START;
+
+    DTCM_HEAP_START = DTCM_START + DTCM_OVERLAY_SIZE;
 }

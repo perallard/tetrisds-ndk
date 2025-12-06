@@ -38,11 +38,12 @@ int main()
 
   // Load code in the ITCM area. Execute it and show the result.
   ndk_overlay_load(ARM9, ITCM_OVERLAY_FAT_ID);
+  ndk_overlay_load(ARM9, DTCM_OVERLAY_FAT_ID);
 
   term_set_cursor(0, 0);
   term_printf("%s", info_text);
   term_set_cursor(0, 5);
-  term_printf("itcm1_fibonacci(10) = %i", itcm1_fibonacci(10));
+  term_printf("tcm1_fibonacci(10) = %i", tcm1_fibonacci(10));
   term_draw();
 
   while (1) {

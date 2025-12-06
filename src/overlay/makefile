@@ -17,7 +17,7 @@ XDELTA_FILE=$(BUILD_DIR)/$(PATCHED_ROM_NAME).xdelta
 
 MODULES=src $(UTIL_PATH) $(NDK_DIR)
 
-OBJS=src/main.o src/common.o src/ovr0.o src/ovr1.o src/ovr_itcm.o \
+OBJS=src/main.o src/common.o src/ovr0.o src/ovr1.o src/ovr_tcm.o \
 	$(UTIL_PATH)/term.o $(NDK_DIR)/symbols.o
 
 ARM9_PATCHES = $(BUILD_DIR)/arm9.o
@@ -52,6 +52,7 @@ $(PATCHED_ROM_FILE): setup $(ARM9_PATCHES)
 	$(OBJCOPY) -O binary -j ovr1 $(ARM9_PATCHES) $(BUILD_DIR)/overlay/overlay_0001.bin
 	$(OBJCOPY) -O binary -j ovr0 $(ARM9_PATCHES) $(BUILD_DIR)/overlay/overlay_0000.bin
 	$(OBJCOPY) -O binary -j itcm1 $(ARM9_PATCHES) $(BUILD_DIR)/overlay/overlay_0002.bin
+	$(OBJCOPY) -O binary -j dtcm1 $(ARM9_PATCHES) $(BUILD_DIR)/overlay/overlay_0003.bin
 	$(OBJCOPY) -O binary -j ovr_tbl $(ARM9_PATCHES) $(BUILD_DIR)/overlay_table.bin
 
 	ndstool -9 $(BUILD_DIR)/arm9_patched.bin -7 $(BUILD_DIR)/arm7.bin \

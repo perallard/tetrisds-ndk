@@ -10,7 +10,7 @@ CFLAGS += -MMD -Werror -Wall -marm -march=armv5te -mtune=arm946e-s \
 
 INCLUDES = -I$(NDK_DIR)/headers -I$(UTIL_PATH)
 
-OBJS = main.o common.o ovr0.o ovr1.o ovr_itcm.o
+OBJS = main.o common.o ovr0.o ovr1.o ovr_tcm.o
 
 .PHONY: all clean
 

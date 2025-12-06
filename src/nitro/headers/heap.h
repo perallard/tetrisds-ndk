@@ -63,12 +63,12 @@
 extern void *MAIN_area_start;
 
 /**
- * DTCM_area_size symbol. Defined only in the symbols object file. Tells how
+ * DTCM_area_size symbols. Defined only in the symbols object file. Tells how
  * big the area in the DTCM memory should be.
  *
  * If DTCM_area_size == 0 then no memory area is defined for DTCM.
  * If DTCM_area_size > 0 then you specify how much memory the user/supervisor
- * stack should be allowed to use. The rest is given to the area.
+ * stacks should be allowed to use. The rest is given to the area.
  *
  * If DTCM_area_size < 0 then you specify how much memory the area is allowed
  * to use and the rest is allocated to user/supervisor stack.
@@ -76,10 +76,23 @@ extern void *MAIN_area_start;
  * The default is zero i.e. all remaining memory is allocated to the
  * user/supervisor stack. Giving a default stack size of about 15Kb.
  *
- * This value should not be altered in SW instead patch the ARM9 binary to the
+ * These values should not be altered in SW instead patch the ARM9 binary to the
  * desired value.
  */
 extern int DTCM_area_size;
+extern int DTCM_area_size_2;
+
+/**
+ * DTCM_area_start symbols. Defined only in the symbols object file. Tells where
+ * DTCM memory heap should start.
+ *
+ * These value should not be altered in SW instead patch the ARM9 binary to the
+ * desired value.
+ */
+extern int DTCM_area_start;
+extern int DTCM_area_start_2;
+extern int DTCM_area_start_3;
+
 
 struct heap_block;
 

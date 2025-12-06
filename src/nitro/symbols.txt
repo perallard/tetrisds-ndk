@@ -367,7 +367,13 @@ bss_start=0x02000b58,object,global
 bss_end=0x02000b5c,object,global
 
 MAIN_area_start=0x02007068,object,global
+
+DTCM_area_start=0x02007184,object,global
+DTCM_area_start_2=0x02007078,object,global
+DTCM_area_start_3=0x02006510,object,global
+
 DTCM_area_size=0x0200717c,object,global
+DTCM_area_size_2=0x02006504,object,global
 
 static_initializer_array=0x02020440,object,global
 

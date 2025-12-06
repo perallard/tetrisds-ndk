@@ -24,7 +24,7 @@ After crt0 has been executed:
                - 0x02400000 Main RAM end
 
   DTCM:
-    0x027c0000 - 0x027c0060 ARM9 data
+    0x027c0000 - 0x027c0060 ARM9 SDK data (IRQ handlers)
                - 0x027c3b80 ARM9 User/System stack top
                - 0x027c3f80 ARM9 IRQ stack top
                - 0x027c3fc0 ARM9 Supervisor stack top
@@ -84,7 +84,7 @@ ARM9 static 'Firmware' memory layout (main RAM):
   0x020a5380 end of static firmware image
 
 
-ARM9 section (test, data and BSS) locations (at run-time)
+ARM9 section (text, data and BSS) locations (at run-time)
   0x02000800 - 0x0205a0cf .text        ~90k ARM instructions
     0x02026500 ~ 0x02051000 .text Tetris game
 
@@ -107,8 +107,12 @@ ARM9 section (test, data and BSS) locations (at run-time)
 
   0x027c0000 - 0x027c0007 ARM9 IRQ state 2 words?
   0x027c0008 - 0x027c005f ARM9 IRQ handlers
+  0x027c0060 - 0x027c3fff ARM9 not used
 
-ASCII 'map' of the ARM9 memory layout:
+  0x01ff8000 - 0x01ff861f ARM9 SDK IRQ and DMA functions
+  0x01ff8620 - 0x01ffffff ARM9 not used
+
+ASCII 'map' of the ARM9 main RAM memory layout:
 
 x = SDK
 _ = Game
