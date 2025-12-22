@@ -13,22 +13,24 @@ BSS_START = 0x20a9d0c;
 BSS_END = 0x0213a130;
 BSS_SIZE = BSS_END - BSS_START;
 
-/* Currently there is no support for compiling code/data to ITCM and DTCM. */
-/* Overlays can be used to load executable code to ITCM and data to DTCM.  */
-
-/* All memory is allocated as stack space. Use DTCM_area_size symbol to    */
-/* specify its size                                                        */
 DTCM_START = 0x027c0060;
+/* CAUTION!! This value is actually the top of the user stack. So it should */
+/* be set to an even lower value.                                           */
+DTCM_END = 0x27C3B80;
+DTCM_SIZE = DTCM_END - DTCM_START;
 
 ITCM_START = 0x01ff8620;
 ITCM_END = 0x02000000;
 ITCM_SIZE = ITCM_END - ITCM_START;
+
 
 MEMORY
 {
     ram_text : ORIGIN = TEXT_START, LENGTH = TEXT_SIZE
     ram_data : ORIGIN = DATA_START, LENGTH = DATA_SIZE
     ram_bss : ORIGIN = BSS_START, LENGTH = BSS_SIZE
+    itcm_mem : ORIGIN = ITCM_START, LENGTH = ITCM_SIZE
+    dtcm_mem : ORIGIN = DTCM_START, LENGTH = DTCM_SIZE
     /* This is just a dummy memory region to simplify managing      */
     /* this script. In particular for overlay files. All section    */
     /* definitions should set the LMA region to: AT>dummy           */
@@ -39,8 +41,7 @@ SECTIONS
 {
     /* Example(s) of how to binary patch the firmware               */
 
-    /* Patch CRT0 to call our new main function. Note it needs to   */
-    /* be a pointer to our new main function.                       */
+    /* Patch CRT0 to call our new main function                     */
     crt0_main_fcn_patch CRT0_main_fcn : {
         *(text_main_fcn_ref)
     } AT>dummy
@@ -49,8 +50,10 @@ SECTIONS
         LONG(HEAP_START);
     } AT>dummy
 
+    /* TCM patches                                                    */
     /* Allocate 4Kb to DTCM memory area. The rest is left for stack   */
     /* usage by the firmware code. See nitro/heap.h for more details. */
+
     dtcm_area_size_patch DTCM_area_size : {
         LONG(0xfffff000)
     } AT>dummy
@@ -70,11 +73,23 @@ SECTIONS
         LONG(DTCM_HEAP_START)
     } AT>dummy
 
+    text_tcm_extend : {
+        src/tcm.o(.text .text*)
+        . = ALIGN(4);
+    } >itcm_mem AT>dummy
 
-    /* Section definitions for the overlays must come before the    */
-    /* section definitions for the main binary because of how LD    */
-    /* wildcard matching works.                                     */
-    INCLUDE overlay.ld
+    data_tcm_extend : {
+        src/tcm.o(.data)
+        src/tcm.o(.rodata .rodata*)
+        . = ALIGN(4);
+    } >dtcm_mem AT>dummy
+
+    bss_tcm_extend : {
+        src/tcm.o(.bss .bss* COMMON)
+        . = ALIGN(4);
+    } >dtcm_mem AT>dummy
+
+    /* All other code and data go to MAIN RAM                      */
 
     text_patch : {
         *(.text .text*)
@@ -92,12 +107,6 @@ SECTIONS
         . = ALIGN(4);
     } >ram_bss AT>dummy
 
-    OVERLAY_START = BSS_END;
-    HEAP_START = OVERLAY_START + OVERLAY_RAM_SIZE;
-
-    ITCM_OVERLAY_START = ITCM_START;
-
-    DTCM_OVERLAY_START = DTCM_START;
-
-    DTCM_HEAP_START = DTCM_START + DTCM_OVERLAY_SIZE;
+    HEAP_START = BSS_END;
+    DTCM_HEAP_START = DTCM_START + SIZEOF(data_tcm_extend) + SIZEOF(bss_tcm_extend);
 }

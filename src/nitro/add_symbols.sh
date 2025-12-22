@@ -15,7 +15,7 @@
 # Empty lines and lines that starts with '#' are
 # ignored.
 #
-# Usage: patcher.sh obeject_file symbol_file
+# Usage: add_symbols.sh obeject_file symbol_file
 
 while read -r line
 do

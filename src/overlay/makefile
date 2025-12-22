@@ -47,7 +47,7 @@ $(MODULES):
 
 $(PATCHED_ROM_FILE): setup $(ARM9_PATCHES)
 	cp $(BUILD_DIR)/arm9.bin $(BUILD_DIR)/arm9_patched.bin
-	$(NDK_DIR)/patcher.sh $(ARM9_PATCHES) $(BUILD_DIR)/arm9_patched.bin
+	$(NDK_DIR)/patch_tool $(ARM9_PATCHES) $(BUILD_DIR)/arm9_patched.bin
 
 	$(OBJCOPY) -O binary -j ovr1 $(ARM9_PATCHES) $(BUILD_DIR)/overlay/overlay_0001.bin
 	$(OBJCOPY) -O binary -j ovr0 $(ARM9_PATCHES) $(BUILD_DIR)/overlay/overlay_0000.bin

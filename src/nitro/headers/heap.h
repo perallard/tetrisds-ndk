@@ -146,7 +146,7 @@ void *ndk_sys_get_memory_end(int area);
 
 /**
  * Call these functions to get the bounds of every memory area. These values
- * where determined at compile time and can not be altered at runtime.
+ * where determined at compile time and should not be altered at runtime.
  *
  * @param area 0-6
  *
