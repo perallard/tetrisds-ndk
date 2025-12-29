@@ -11,12 +11,12 @@
  */
 
 /*
- * TODO: input checks
  * TODO: handle endianess
  * TODO: handle interger sizes correctly.
  * 
  * NDS: is little endian
  *      long long int == int64_t
+ *      long          == int32_t
  *      int           == int32_t
  *      short         == int16_t
  *      char          == int8_t | uint8_t
@@ -39,7 +39,6 @@
 #define DTCM_BSS 0
 
 const char *devkit_envvar = "DEVKITARM";
-const char *patch_suffix = "_patch";
 
 typedef struct buffer buffer; 
 
@@ -369,7 +368,7 @@ int apply_patches(char *firmware_file, char *object_file)
       continue;
     }
 
-    if (!str_suffix(name, patch_suffix)) {
+    if (!str_suffix(name, "_patch")) {
       continue;
     }
 

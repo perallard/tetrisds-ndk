@@ -26,7 +26,7 @@ inline fix12 fix_mul(fix12 a, fix12 b)
  * @param alpha angle
  * @return Cosine
  */
-static inline fix12 fix_cos(fix_angle alpha)
+static inline fix12 ndk_fix_cos(fix_angle alpha)
 {
     return fix_trig_table[FIX_ANGLE_TO_TABLE_INDEX(alpha)].cos;
 }
@@ -37,7 +37,7 @@ static inline fix12 fix_cos(fix_angle alpha)
  * @param alpha angle
  * @return Sine
  */
-static inline fix12 fix_sin(fix_angle alpha)
+static inline fix12 ndk_fix_sin(fix_angle alpha)
 {
     return fix_trig_table[FIX_ANGLE_TO_TABLE_INDEX(alpha)].sin;
 }
